@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
   std::string input_csv(argv[kInputCSV]);
 
   auto& channel_map = chmap::ChannelMap::get_instance();
-//   std::cout << channel_map.initialize(input_csv) << " entries loaded." << std::endl;
+  channel_map.initialize(input_csv);
 
   /*
     test use for mapdata.csv
