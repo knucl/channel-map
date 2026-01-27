@@ -9,12 +9,23 @@ namespace chmap {
 std::ofstream devnull("/dev/null");
 
 enum class LogLevel { kDEBUG, kINFO, kWARNING, kERROR };
+inline LogLevel thr_LogLevel = LogLevel::kDEBUG;
+inline void SetLogLevel_thr(LogLevel level){
+  thr_LogLevel = level;
+}
+inline LogLevel GetLogLevel_thr(){
+  return thr_LogLevel;
+}
 
 class LogBuffer : public std::stringbuf {
 public:
   LogBuffer(LogLevel level) : m_level(level) {}
 
   int sync() override {
+    if(m_level < thr_LogLevel){
+      str(""); // clear the buffer
+      return 0;
+    }
     std::cout << level_name() << "\033[0m" << str();
     str("");
     return 0;
