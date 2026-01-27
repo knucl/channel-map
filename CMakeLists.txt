@@ -18,23 +18,32 @@ message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
+    set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
+
 set(CMAKE_BUILD_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
+
 
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.hpp")
 
 ### main library
 add_library(channel-map SHARED ${SOURCES})
-target_include_directories(channel-map PUBLIC include)
-target_include_directories(channel-map PRIVATE)
+target_include_directories(channel-map PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+) ### ビルド時はソースディレクトリ、インストール後はインストール先のincludeを参照
 
 ### filesystem
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(FILESYSTEM_LIB stdc++fs)
 endif()
+target_link_libraries(channel-map PUBLIC stdc++fs)
 
 ### script
 set(SCRIPT_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/script/chmap-config)
