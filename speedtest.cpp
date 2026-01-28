@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
         const auto& fe = channel_map.get("fe", det);
         auto t1 = std::chrono::high_resolution_clock::now();
         double elapsed = std::chrono::duration<double, std::micro>(t1 - t0).count();
-        std::cout << "Elapsed time for 1,000,000 get() calls: " << elapsed << " microseconds" << std::endl;
 
 
         auto t2 = std::chrono::high_resolution_clock::now();
@@ -45,7 +44,7 @@ int main(int argc, char* argv[]) {
         }
         auto t3 = std::chrono::high_resolution_clock::now();
         double elapsed_inv = std::chrono::duration<double, std::micro>(t3 - t2).count();
-        std::cout << "Elapsed time for 1,000,000 inverse get() calls: " << elapsed_inv << " microseconds" << std::endl;
+        const auto& utof_left_det = channel_map.get("detector", fe);
 
 
         auto t4 = std::chrono::high_resolution_clock::now();
@@ -54,7 +53,6 @@ int main(int argc, char* argv[]) {
         }
         auto t5 = std::chrono::high_resolution_clock::now();
         double elapsed_access = std::chrono::duration<double, std::micro>(t5 - t4).count();
-        std::cout << "Elapsed time for 1,000,000 element accesses: " << elapsed_access << " microseconds" << std::endl;
 
 
         auto t6 = std::chrono::high_resolution_clock::now();
@@ -63,7 +61,31 @@ int main(int argc, char* argv[]) {
         }
         auto t7 = std::chrono::high_resolution_clock::now();
         double elapsed_access_index = std::chrono::duration<double, std::micro>(t7 - t6).count();
-        std::cout << "Elapsed time for 1,000,000 element accesses by index: " << elapsed_access_index << " microseconds" << std::endl;
+
+
+        auto t8 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<1000000; ++i){
+            std::string det_name = std::get<std::string>(utof_left_det.at("id"));
+        }
+        auto t9 = std::chrono::high_resolution_clock::now();
+        double elapsed_access_det = std::chrono::duration<double, std::micro>(t9 - t8).count();
+
+
+        auto t10 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<1000000; ++i){
+            std::string det_name = std::get<std::string>(utof_left_det.at(0));
+        }
+        auto t11 = std::chrono::high_resolution_clock::now();
+        double elapsed_access_det_index = std::chrono::duration<double, std::micro>(t11 - t10).count();
+
+        std::cout << "Results of 1,000,000 accesses:\n"
+                  << "\tget fe from det: " << elapsed/1000000.0 << " us / access\n"
+                  << "\tget det from fe: " << elapsed_inv/1000000.0 << " us / access\n"
+                  << "\taccess fe.at(\"id\"): " << elapsed_access/1000000.0 << " us / access\n"
+                  << "\taccess fe.at(0): " << elapsed_access_index/1000000.0 << " us / access\n"
+                  << "\taccess det.at(\"id\"): " << elapsed_access_det/1000000.0 << " us / access\n"
+                  << "\taccess det.at(0): " << elapsed_access_det_index/1000000.0 << " us / access\n"
+                  << std::endl;
 
 
       const auto& utof_left_det = channel_map.get("detector", fe);
