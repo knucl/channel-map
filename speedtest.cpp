@@ -57,11 +57,16 @@ int main(int argc, char* argv[]) {
         std::get_if<T> returns a pointer to the value if the specified
         type T matches the current type of std::variant, nullptr otherwise.
       */
-      std::cout << std::string(80, '=') << std::endl
-                << "fe[0] : " << *std::get_if<chmap::number_t>(&fe.at(0))
-                << " fe[1] : " << *std::get_if<chmap::number_t>(&fe.at(1))
-                << " fe[2] : " << *std::get_if<chmap::number_t>(&fe.at(2))
-                << std::endl;
+      std::cout << std::string(80, '=') << std::endl;
+      for(int i=0; i<fe.size(); ++i) {
+        if(auto p = std::get_if<chmap::number_t>(&fe.at(i))){
+            std::cout << "fe[" << i << "] : " << *p << std::endl;
+            } else if(auto p = std::get_if<std::string>(&fe.at(i))) {
+            std::cout << "fe[" << i << "] : " << *p << std::endl;
+            } else {
+            std::cerr << "The variant does not hold number or string" << std::endl;
+        }
+
 
       if (auto value = std::get_if<chmap::number_t>(&fe.at(2))) {
         std::cout << "The value is number : " << *value << std::endl;
