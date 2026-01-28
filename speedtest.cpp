@@ -44,8 +44,8 @@ int main(int argc, char* argv[]) {
                   << " fe[id] : " << std::get<chmap::number_t>(fe["id"])
                   << " fe[1] : " << std::get<chmap::number_t>(fe[1])
                   << " fe[channel] : " << std::get<chmap::number_t>(fe["channel"])
-                  << " fe[2] : " << std::get<std::string>(fe[2])
-                  << " fe[data] : " << std::get<std::string>(fe["data"])
+                  << " fe[2] : " << std::get<chmap::number_t>(fe[2])
+                  << " fe[data] : " << std::get<chmap::number_t>(fe["data"])
                   << std::endl;
         auto value = std::get<std::string>(fe.at(0));
         std::cout << "fe[0] : " << value << std::endl;
