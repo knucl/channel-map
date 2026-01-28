@@ -29,9 +29,10 @@ int main(int argc, char* argv[]) {
         chmap::ChannelTuple det("utof", 0, 0, "left", 0); // Left readout of UTOF
 
 
+        uint32_t numLoops = 1e7;
         auto t0 = std::chrono::high_resolution_clock::now();
         chmap::ChannelTuple fe;
-        for(int i=0; i<1000000; ++i){
+        for(int i=0; i<numLoops; ++i){
             fe = channel_map.get("fe", det);
         }
         auto t1 = std::chrono::high_resolution_clock::now();
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
 
         auto t2 = std::chrono::high_resolution_clock::now();
         chmap::ChannelTuple utof_left_det;
-        for(int i=0; i<1000000; ++i){
+        for(int i=0; i<numLoops; ++i){
             utof_left_det = channel_map.get("detector", fe);
         }
         auto t3 = std::chrono::high_resolution_clock::now();
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
 
         auto t4 = std::chrono::high_resolution_clock::now();
         uint64_t femId;
-        for(int i=0; i<1000000; ++i){
+        for(int i=0; i<numLoops; ++i){
             femId = std::get<chmap::number_t>(fe.at("id"));
         }
         auto t5 = std::chrono::high_resolution_clock::now();
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]) {
 
         auto t6 = std::chrono::high_resolution_clock::now();
         uint64_t femId_index;
-        for(int i=0; i<1000000; ++i){
+        for(int i=0; i<numLoops; ++i){
             femId_index = std::get<chmap::number_t>(fe.at(0));
         }
         auto t7 = std::chrono::high_resolution_clock::now();
@@ -69,7 +70,7 @@ int main(int argc, char* argv[]) {
 
         auto t8 = std::chrono::high_resolution_clock::now();
         std::string det_name;
-        for(int i=0; i<1000000; ++i){
+        for(int i=0; i<numLoops; ++i){
             det_name = std::get<std::string>(utof_left_det.at("id"));
         }
         auto t9 = std::chrono::high_resolution_clock::now();
@@ -78,13 +79,13 @@ int main(int argc, char* argv[]) {
 
         auto t10 = std::chrono::high_resolution_clock::now();
         std::string det_name_index;
-        for(int i=0; i<1000000; ++i){
+        for(int i=0; i<numLoops; ++i){
             det_name_index = std::get<std::string>(utof_left_det.at(0));
         }
         auto t11 = std::chrono::high_resolution_clock::now();
         double elapsed_access_det_index = std::chrono::duration<double, std::micro>(t11 - t10).count();
 
-        std::cout << "Results of 1,000,000 accesses:\n"
+        std::cout << "Results of " << numLoops << " accesses:\n"
                   << "\tget fe from det: " << elapsed/1000000.0 << " us / access\n"
                   << "\tget det from fe: " << elapsed_inv/1000000.0 << " us / access\n"
                   << "\taccess fe.at(\"id\"): " << elapsed_access/1000000.0 << " us / access\n"
