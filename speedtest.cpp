@@ -149,16 +149,31 @@ int main(int argc, char* argv[]) {
                   << std::endl;
 
 
-      for(const auto& e : utof_left_det){
+        for(const auto& e : utof_left_det){
         std::cout << "element : " << e << std::endl;
-      }
+        }
 
-      std::cout << "det = " << det << std::endl
+        std::cout << "det = " << det << std::endl
                 << "-> fe = " << std::hex << fe << std::endl;
 
-      for (const auto& e : fe) {
+        for (const auto& e : fe) {
         std::cout << "element : " << e << std::endl;
-      }
+        }
+
+        chmap::ChannelTuple void_fe(std::get<chmap::number_t>(utof_left_fe[0]), -1, std::get<chmap::number_t>(utof_left_fe[2]));
+        std::cout << "void_fe = " << void_fe << std::endl;
+        chmap::ChannelTuple void_det;
+        auto t20 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<numLoops; ++i){
+            void_det = channel_map.get("detector", void_fe);
+        }
+        auto t21 = std::chrono::high_resolution_clock::now();
+        double elapsed_void_det = std::chrono::duration<double, std::micro>(t21 - t20).count();
+
+        std::cout << "Void det results of " << numLoops << " accesses:\n"
+                  << "\tget det from void fe: " << elapsed_void_det/1000000.0 << " us / access\n"
+                  << std::endl;
+      
 
 
       /*
