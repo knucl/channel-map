@@ -88,7 +88,6 @@ int main(int argc, char* argv[]) {
                   << std::endl;
 
 
-      const auto& utof_left_det = channel_map.get("detector", fe);
       for(const auto& e : utof_left_det){
         std::cout << "element : " << e << std::endl;
       }
