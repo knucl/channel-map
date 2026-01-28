@@ -44,10 +44,10 @@ int main(int argc, char* argv[]) {
                   << " fe[id] : " << std::get<chmap::number_t>(fe["id"])
                   << " fe[1] : " << std::get<chmap::number_t>(fe[1])
                   << " fe[channel] : " << std::get<chmap::number_t>(fe["channel"])
-                //   << " fe[2] : " << std::get<chmap::number_t>(fe[2])
+                  << " fe[2] : " << std::get<chmap::number_t>(fe[2])
                   << " fe[data] : " << std::get<chmap::number_t>(fe["data"])
                   << std::endl;
-        auto value = std::get<std::string>(fe.at(0));
+        auto value = std::get<chmap::number_t>(fe.at(0));
         std::cout << "fe[0] : " << value << std::endl;
       } catch (const std::bad_variant_access& e) {
         std::cerr << "Bad variant access : " << e.what() << std::endl;
@@ -60,12 +60,12 @@ int main(int argc, char* argv[]) {
       std::cout << std::string(80, '=') << std::endl
                 << "fe[0] : " << *std::get_if<chmap::number_t>(&fe.at(0))
                 << " fe[1] : " << *std::get_if<chmap::number_t>(&fe.at(1))
-                << " fe[2] : " << *std::get_if<std::string>(&fe.at(2))
+                << " fe[2] : " << *std::get_if<chmap::number_t>(&fe.at(2))
                 << std::endl;
 
       if (auto value = std::get_if<chmap::number_t>(&fe.at(2))) {
         std::cout << "The value is number : " << *value << std::endl;
-      } else if (auto value = std::get_if<std::string>(&fe.at(2))) {
+      } else if (auto value = std::get_if<chmap::number_t>(&fe.at(2))) {
         std::cout << "The value is string : " << *value << std::endl;
       } else {
         std::cerr << "The variant does not hold number or string" << std::endl;
