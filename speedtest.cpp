@@ -57,6 +57,15 @@ int main(int argc, char* argv[]) {
         std::cout << "Elapsed time for 1,000,000 element accesses: " << elapsed_access << " microseconds" << std::endl;
 
 
+        auto t6 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<1000000; ++i){
+            uint64_t femId = std::get<chmap::number_t>(fe.at(0));
+        }
+        auto t7 = std::chrono::high_resolution_clock::now();
+        double elapsed_access_index = std::chrono::duration<double, std::micro>(t7 - t6).count();
+        std::cout << "Elapsed time for 1,000,000 element accesses by index: " << elapsed_access_index << " microseconds" << std::endl;
+
+
       const auto& utof_left_det = channel_map.get("detector", fe);
       for(const auto& e : utof_left_det){
         std::cout << "element : " << e << std::endl;
