@@ -50,6 +50,47 @@ int main(int argc, char* argv[]) {
         utof_left_det = channel_map.get("detector", fe);
 
 
+        chmap::ChannelTuple utof_right_det("utof", 0, 0, "right", 0); // Right readout of UTOF
+        chmap::ChannelTuple utof_right_fe = channel_map.get("fe", utof_right_det);
+        for(const auto& e : utof_right_fe){
+            std::cout << "element : " << e << std::endl;
+        }
+        auto t12 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<numLoops; ++i){
+            utof_right_fe = channel_map.get("fe", utof_right_det);
+        }
+        auto t13 = std::chrono::high_resolution_clock::now();
+        double elapsed_utof_right = std::chrono::duration<double, std::micro>(t13 - t12).count();
+
+
+        chmap::ChannelTuple utof_left_fe = channel_map.get("fe", utof_left_det);
+        auto t14 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<numLoops; ++i){
+            utof_left_det = channel_map.get("detector", utof_left_fe);
+        }
+        auto t15 = std::chrono::high_resolution_clock::now();
+        double elapsed_utof_left = std::chrono::duration<double, std::micro>(t15 - t14).count();
+
+
+        chmap::ChannelTuple t1_right_det("t1", 0, 0, "right", 0); // Right readout of T1
+        chmap::ChannelTuple t1_right_fe = channel_map.get("fe", t1_right_det);
+        auto t16 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<numLoops; ++i){
+            t1_right_fe = channel_map.get("fe", t1_right_det);
+        }
+        auto t17 = std::chrono::high_resolution_clock::now();
+        double elapsed_t1_right = std::chrono::duration<double, std::micro>(t17 - t16).count();
+
+
+        chmap::ChannelTuple t1_left_det("t1", 0, 0, "left", 0); // Left readout of T1
+        chmap::ChannelTuple t1_left_fe = channel_map.get("fe", t1_left_det);
+        auto t18 = std::chrono::high_resolution_clock::now();
+        for(int i=0; i<numLoops; ++i){
+            t1_left_fe = channel_map.get("fe", t1_left_det);
+        }
+        auto t19 = std::chrono::high_resolution_clock::now();
+        double elapsed_t1_left = std::chrono::duration<double, std::micro>(t19 - t18).count();
+
         auto t4 = std::chrono::high_resolution_clock::now();
         uint64_t femId;
         for(int i=0; i<numLoops; ++i){
@@ -86,12 +127,25 @@ int main(int argc, char* argv[]) {
         double elapsed_access_det_index = std::chrono::duration<double, std::micro>(t11 - t10).count();
 
         std::cout << "Results of " << numLoops << " accesses:\n"
-                  << "\tget fe from det: " << elapsed/1000000.0 << " us / access\n"
-                  << "\tget det from fe: " << elapsed_inv/1000000.0 << " us / access\n"
+                  << "\tget fe from det(utof left): " << elapsed/1000000.0 << " us / access\n"
+                  << "\tget det(utof left) from fe: " << elapsed_inv/1000000.0 << " us / access\n"
                   << "\taccess fe.at(\"id\"): " << elapsed_access/1000000.0 << " us / access\n"
                   << "\taccess fe.at(0): " << elapsed_access_index/1000000.0 << " us / access\n"
                   << "\taccess det.at(\"id\"): " << elapsed_access_det/1000000.0 << " us / access\n"
                   << "\taccess det.at(0): " << elapsed_access_det_index/1000000.0 << " us / access\n"
+                  << std::endl;
+
+        std::cout << "UTOF right results of " << numLoops << " accesses:\n"
+                  << "\tget det from fe: " << elapsed_utof_right/1000000.0 << " us / access\n"
+                  << std::endl;
+        std::cout << "UTOF left results of " << numLoops << " accesses:\n"
+                  << "\tget fe from det: " << elapsed_utof_left/1000000.0 << " us / access\n"
+                  << std::endl;
+        std::cout << "T1 right results of " << numLoops << " accesses:\n"
+                  << "\tget fe from det: " << elapsed_t1_right/1000000.0 << " us / access\n"
+                  << std::endl;
+        std::cout << "T1 left results of " << numLoops << " accesses:\n"
+                  << "\tget fe from det: " << elapsed_t1_left/1000000.0 << " us / access\n"
                   << std::endl;
 
 
