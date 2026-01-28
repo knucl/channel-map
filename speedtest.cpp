@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
       chmap::ChannelTuple det("utof", 0, 0, "left", 0); // Left readout of UTOF
       const auto& fe = channel_map.get("fe", det);
       std::cout << "det = " << det << std::endl
-                << "-> fe = " << fe << std::endl;
+                << "-> fe = " << std::hex << fe << std::endl;
 
       for (const auto& e : fe) {
         std::cout << "element : " << e << std::endl;
