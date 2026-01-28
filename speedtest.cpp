@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
         chmap::ChannelTuple det("utof", 0, 0, "left", 0); // Left readout of UTOF
 
 
-        uint32_t numLoops = 1e7;
+        uint32_t numLoops = 1e6;
         auto t0 = std::chrono::high_resolution_clock::now();
         chmap::ChannelTuple fe;
         for(int i=0; i<numLoops; ++i){
