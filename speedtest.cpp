@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <channel_map.hpp>
+#include <debug_print.hpp>
 
 #define SPEEDTEST 1
 
@@ -21,6 +22,7 @@ int main(int argc, char* argv[]) {
     auto& channel_map = chmap::ChannelMap::get_instance();
     channel_map.initialize(input_csv);
 
+    chmap::SetLogLevel_thr(chmap::LogLevel::kERROR);
     /*
         test use for mapdata.csv
     */
