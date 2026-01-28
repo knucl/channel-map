@@ -65,26 +65,26 @@ int main(int argc, char* argv[]) {
 
       if (auto value = std::get_if<chmap::number_t>(&fe.at(2))) {
         std::cout << "The value is number : " << *value << std::endl;
-      } else if (auto value = std::get_if<chmap::number_t>(&fe.at(2))) {
+      } else if (auto value = std::get_if<std::string>(&fe.at(2))) {
         std::cout << "The value is string : " << *value << std::endl;
       } else {
         std::cerr << "The variant does not hold number or string" << std::endl;
       }
     }
 
-    /*
-      If the key is missing, a null tuple is returned.
-     */
-    {
-      chmap::ChannelTuple det(0, 1, 2, 3);
-      const auto& fe = channel_map.get("fe", det);
-      std::cout << "fe = " << fe << std::endl;
-    }
+    // /*
+    //   If the key is missing, a null tuple is returned.
+    //  */
+    // {
+    //   chmap::ChannelTuple det(0, 1, 2, 3);
+    //   const auto& fe = channel_map.get("fe", det);
+    //   std::cout << "fe = " << fe << std::endl;
+    // }
 
-    {
-      const auto& fe = channel_map.get("fe", {0, "1", 2, "3"});
-      std::cout << "fe = " << fe << std::endl;
-    }
+    // {
+    //   const auto& fe = channel_map.get("fe", {0, "1", 2, "3"});
+    //   std::cout << "fe = " << fe << std::endl;
+    // }
   }
 
   return EXIT_SUCCESS;
