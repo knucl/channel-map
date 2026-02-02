@@ -40,6 +40,8 @@ namespace chmap {
                 std::cerr << "bad file format : " << line << std::endl;
                 continue;
             }
+            ChannelMapSimpleItem item = makeSimpleItem(tokens);
+            channel_map_simple_items.push_back(item);
 
             
         }
