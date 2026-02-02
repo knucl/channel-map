@@ -5,6 +5,41 @@
 #include <iostream>
 #include <sstream>
 
+
+/*
+channel-mapをもとに、インプットとアウトプットの形式の自由度を減らすことにより、機能を限定し、処理の高速化を図る、channel-map-simpleの実装。
+    - channel-map-simpleでは、インプットファイルのフォーマットは
+        "fe.id, fe.channel, fe.data, detector.id, detector.plane, detector.segment, detector.channel, detector.data"
+        のように、3要素と5要素の組み合わせに限定する。
+        fe.idは64bit整数のデータを仮定し、その下位16bit(192.168.FF.FF)を使用する。
+        fe.channelは最大16bit整数、fe.dataは使用しない。
+        detector.idは最大4文字の文字列、detector.planeは最大2文字の文字列、detector.segmentは最大8bit整数、detector.channelは最大4文字の文字列、detector.dataは使用しない。
+    - detector.id, detector.plane, detector.channelについては、固定長文字列への変換をハードコードで実装している。
+        例えば、detector.idには "utof", "dtof", "ltof", "t0", "t0ref", "t1", "all_charged", "bftref", "bdc", "kldc", "left", "right", "bottom", "upstream", "downstream" が使える。
+        また、detector.planeには "X", "U", "V", "Xp", "Up", "Vp" が使える。
+    - FE側のIP, CHをまとめてuint32_tのidにし、、detector側のname, plane, segment, channelをそれぞれuint32_t, uint16_t, uint8_t, uint32_tに変換して格納する。
+    - そのペアをFE側のidの大小でソートし、vectorに格納する。
+    - DAQワードに記載されているFEのIP,CHから作るキーで二分探索を行い、対応するdetector側のname, plane, segment, channelを高速に取得できるようにする。
+*/
+/*
+    class ChannelMapSimple method list
+        public:
+            static ChannelMapSimple& get_instance();
+            ~ChannelMapSimple();
+
+            void initialize(const std::string& file_path);
+        private:
+            std::vector<std::string> split_line(const std::string& line, char delimiter = ',');
+            std::vector<std::string> m_header, m_element_type, m_unique_types;
+            ChannelMapSimpleItem makeSimpleItem(const std::vector<std::string>& tokens);
+            void simplify_detector_names();
+            uint32_t four_char_to_uint32(char a, char b, char c, char d);
+            uint16_t four_char_to_uint16(char a, char b);
+            bool isTokenNumeric(const std::string& token);
+            uint32_t parse_to32(const std::string& token);
+            uint16_t parse_to16(const std::string& token);
+            uint8_t parse_to8(const std::string& token);
+*/
 namespace chmap {
     void ChannelMapSimple::initialize(const std::string& file_path) {
         simplify_detector_names(); // prepare detname_simplify_map
@@ -42,9 +77,7 @@ namespace chmap {
             }
             ChannelMapSimpleItem item = makeSimpleItem(tokens);
             channel_map_simple_items.push_back(item);
-
-            
-        }
+        }// while getline(file, line) for loading mapdata
 
     }// void ChannelMapSimple::initialize
     std::vector<std::string> ChannelMapSimple::split_line(const std::string& line, char delimiter) {
