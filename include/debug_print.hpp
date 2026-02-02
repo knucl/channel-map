@@ -9,7 +9,7 @@ namespace chmap {
 std::ofstream devnull("/dev/null");
 
 enum class LogLevel { kDEBUG, kINFO, kWARNING, kERROR };
-inline LogLevel thr_LogLevel = LogLevel::kDEBUG;
+inline LogLevel thr_LogLevel = LogLevel::kERROR;
 inline void SetLogLevel_thr(LogLevel level){
   thr_LogLevel = level;
 }
