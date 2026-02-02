@@ -19,7 +19,7 @@ channel-mapをもとに、インプットとアウトプットの形式の自由
         また、detector.planeには "X", "U", "V", "Xp", "Up", "Vp" が使える。
     - FE側のIP, CHをまとめてuint32_tのidにし、、detector側のname, plane, segment, channelをそれぞれuint32_t, uint16_t, uint8_t, uint32_tに変換して格納する。
     - そのペアをFE側のidの大小でソートし、vectorに格納する。
-    - DAQワードに記載されているFEのIP,CHから作るキーで二分探索を行い、対応するdetector側のname, plane, segment, channelを高速に取得できるようにする。
+    - DAQワードに記載されているFEのIP,CHから作るキーで二分探索を行い、得たrankを用いてdetector側のvectorの要素にアクセスする
 */
 /*
     class ChannelMapSimple method list
