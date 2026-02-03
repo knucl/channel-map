@@ -3,8 +3,14 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <channel_map.hpp>
+#include <debug_print.hpp>
+#include <channel_tuple.hpp>
+#include <element.hpp>
 
 #include <chrono>
+
+#define general_chmap 1
 
 /*
 mapdata.csvのファイルパスを与えるとchannel-map-simpleの動作テストをする
@@ -13,6 +19,20 @@ int main(int argc, char* argv[]) {
     std::string input_file_path = argv[1];
     chmap::ChannelMapSimple& channel_map_simple = chmap::ChannelMapSimple::get_instance();
     channel_map_simple.initialize(input_file_path);
+    #if general_chmap
+    chmap::ChannelMap& channel_map = chmap::ChannelMap::get_instance();
+    channel_map.initialize(input_file_path);
+    chmap::ChannelTuple test_det1("utof", 0, 0, "right", 0);
+    chmap::ChannelTuple test_det2("t0", 0, 0, "left", 0);
+    chmap::ChannelTuple test_det3("bdc", "X", 1, 1, 0);
+    chmap::ChannelTuple fe1 = channel_map.get("fe", test_det1);
+    chmap::ChannelTuple fe2 = channel_map.get("fe", test_det2);
+    chmap::ChannelTuple fe3 = channel_map.get("fe", test_det3);
+    std::cout << "\n[in simple_skeleton.cpp] General ChannelMap results:" << std::endl;
+    std::cout << "  for det: " << test_det1 << ", fe: " << fe1 << std::endl;
+    std::cout << "  for det: " << test_det2 << ", fe: " << fe2 << std::endl;
+    std::cout << "  for det: " << test_det3 << ", fe: " << fe3 << std::endl;
+    #endif
 
     std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized." << std::endl;
     // channel_map_simple.printAllItemsFE();
