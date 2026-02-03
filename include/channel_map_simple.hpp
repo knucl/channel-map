@@ -5,8 +5,10 @@
 #include <string>
 #include <filesystem>
 #include <unordered_map>
-// #include <optional>
+#include <variant>
 #include "channel_map_simple_item.hpp"
+#include "channel_tuple.hpp"
+#include "element.hpp"
 
 namespace chmap {
 
@@ -16,7 +18,7 @@ namespace chmap {
             ~ChannelMapSimple();
 
             void initialize(const std::string& file_path);
-            std::vector<ChannelMapSimpleItem> channel_map_simple_items;
+            std::vector<ChannelMapSimpleItem> fItems;
             std::unordered_map<std::string, uint32_t> mapdata_string_simplify_map32;
             std::unordered_map<std::string, uint16_t> mapdata_string_simplify_map16;
             std::vector<ChannelMapSimpleItem_FE> fItemsFE;
@@ -26,6 +28,8 @@ namespace chmap {
             void printAllItemsFE();
             void printAllItemsDET();
             void checkDuplicateFEIDs();
+            void printFEid(ChannelMapSimpleItem_FE fe_item);
+            void printDETinfo(ChannelMapSimpleItem_DET det_item);
 
             ChannelMapSimple(const ChannelMapSimple&) = delete; // prevent copy constructor
             ChannelMapSimple& operator=(const ChannelMapSimple&) = delete; // prevent copy assignment
@@ -41,7 +45,8 @@ namespace chmap {
             uint32_t parse_to32(const std::string& token);
             uint16_t parse_to16(const std::string& token);
             uint8_t parse_to8(const std::string& token);
-            
+            // void printFEid(ChannelMapSimpleItem_FE fe_item);
+            // void printDETinfo(ChannelMapSimpleItem_DET det_item);
 
             ChannelMapSimple() = default; // private default constructor
 

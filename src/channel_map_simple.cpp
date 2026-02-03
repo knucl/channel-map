@@ -1,5 +1,7 @@
 #include "channel_map_simple.hpp"
 #include "channel_map_simple_item.hpp"
+#include "channel_tuple.hpp"
+#include "element.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -8,7 +10,7 @@
 #include <algorithm>
 #include <cctype>
 
-#include <optional>
+#include <variant>
 
 #define DEBUG_PRINT 0
 
@@ -147,33 +149,32 @@ namespace chmap {
                       << ", channel: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.det.channel << std::dec
                       << std::endl;
             #endif
-            channel_map_simple_items.push_back(item);
+            fItems.push_back(item);
         }// while getline(file, line) for loading mapdata
         #if DEBUG_PRINT
         std::cout << "finished loading mapdata lines" << std::endl;
-        std::cout << "total loaded items: " << channel_map_simple_items.size() << std::endl;
+        std::cout << "total loaded items: " << fItems.size() << std::endl;
         #endif
 
         #if DEBUG_PRINT
-        std::cout << "start sorting channel_map_simple_items by fe.id" << std::endl;
+        std::cout << "start sorting fItems by fe.id" << std::endl;
         #endif
-        // sort channel_map_simple_items by fe.id
-        std::sort(channel_map_simple_items.begin(), channel_map_simple_items.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
+        // sort fItems by fe.id
+        std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
             return left.fe.id < right.fe.id;
         });
         #if DEBUG_PRINT
-        std::cout << "finished sorting channel_map_simple_items" << std::endl;
+        std::cout << "finished sorting fItems" << std::endl;
         #endif
 
         std::vector<ChannelMapSimpleItem_FE> fe_items;
         std::vector<ChannelMapSimpleItem_DET> det_items;
-        for(const auto& item : channel_map_simple_items){
+        for(const auto& item : fItems){
             fe_items.push_back(item.fe);
             det_items.push_back(item.det);
         }
         fItemsFE = fe_items;
         fItemsDET = det_items;
-        channel_map_simple_items.clear();
 
         #if DEBUG_PRINT
         std::cout << "initialized ChannelMapSimple with " << fItemsFE.size() << " items." << std::endl;
@@ -470,4 +471,31 @@ namespace chmap {
         }
         std::cout << "[checkDuplicateFEIDs] check completed." << std::endl;
     }// void ChannelMapSimple::checkDuplicateFEIDs
+
+    void ChannelMapSimple::printFEid(ChannelMapSimpleItem_FE fe_item) {
+        std::cout << "\tFE id: 0x" << std::hex << std::setw(8) << std::setfill('0') << fe_item.id << std::dec << std::endl;
+        std::cout << "\t\tip 3rd octet: " << std::setw(2) << std::setfill('0') << ((fe_item.id >> 24) & 0xFF) << std::endl;
+        std::cout << "\t\tip 4th octet: " << std::setw(2) << std::setfill('0') << ((fe_item.id >> 16) & 0xFF) << std::endl;
+        std::cout << "\t\tchannel: " << std::setw(4) << std::setfill('0') << (fe_item.id & 0xFFFF) << std::endl;
+    }// void ChannelMapSimple::printFEid
+
+    void ChannelMapSimple::printDETinfo(ChannelMapSimpleItem_DET det_item) {
+        std::cout << "\tDET name: 0x" << std::setw(8) << std::setfill('0') << det_item.name;
+        std::cout << " (char: " << static_cast<char>((det_item.name >> 24) & 0xFF)
+                  << static_cast<char>((det_item.name >> 16) & 0xFF)
+                  << static_cast<char>((det_item.name >> 8) & 0xFF)
+                  << static_cast<char>(det_item.name & 0xFF)
+                  << ")," << std::endl;
+        std::cout << "\tplane: 0x" << std::setw(4) << std::setfill('0') << det_item.plane;
+        std::cout << " (char: " << static_cast<char>((det_item.plane >> 8) & 0xFF)
+                  << static_cast<char>(det_item.plane & 0xFF)
+                  << ")," << std::endl;
+        std::cout << "\tsegment: " << static_cast<uint8_t>(det_item.segment) << "," << std::endl;
+        std::cout << "\tchannel: 0x" << std::setw(8) << std::setfill('0');
+        std::cout << det_item.channel << " (char: " << static_cast<char>((det_item.channel >> 24) & 0xFF)
+                  << static_cast<char>((det_item.channel >> 16) & 0xFF)
+                  << static_cast<char>((det_item.channel >> 8) & 0xFF)
+                  << static_cast<char>(det_item.channel & 0xFF)
+                  << ")" << std::endl;
+    }// void ChannelMapSimple::printDETinfo
 }// namespace chmap

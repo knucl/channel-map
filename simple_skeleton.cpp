@@ -1,12 +1,15 @@
-#include <channel_map_simple.hpp>
-#include <channel_map_simple_item.hpp>
+#include "channel_map_simple.hpp"
+#include "channel_map_simple_item.hpp"
+
+#include "channel_map.hpp"
+#include "debug_print.hpp"
+#include "channel_tuple.hpp"
+#include "element.hpp"
+
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <channel_map.hpp>
-#include <debug_print.hpp>
-#include <channel_tuple.hpp>
-#include <element.hpp>
+
 #include <cstdlib>
 #include <variant>
 
@@ -21,6 +24,7 @@ int main(int argc, char* argv[]) {
     std::string input_file_path = argv[1];
     chmap::ChannelMapSimple& channel_map_simple = chmap::ChannelMapSimple::get_instance();
     channel_map_simple.initialize(input_file_path);
+
     #if general_chmap
     chmap::ChannelMap& channel_map = chmap::ChannelMap::get_instance();
     channel_map.initialize(input_file_path);
@@ -57,13 +61,15 @@ int main(int argc, char* argv[]) {
     uint8_t test_ip4th_T1right = 0xAA;
     uint16_t test_ch_T1right = 12;
 
-    std::cout << "\n[in simple_skeleton.cpp] Testing getDETItem for FE id composed of ip3rd=" << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(test_ip3rd_T1right) << ", ip4th=" << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(test_ip4th_T1right) << ", ch=" << std::dec << test_ch_T1right  << std::endl;
+    std::cout << "\n[in simple_skeleton.cpp] Testing getDETItem for FE id of: " << std::endl;
+    channel_map_simple.printFEid( chmap::ChannelMapSimpleItem_FE(test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right) );
+    std::cout << "\tCorresponding DET info:" << std::endl;
     chmap::ChannelMapSimpleItem_DET* det_item_T1right = channel_map_simple.getDETItem(test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right);
-    std::cout << "\tDET item for FE id: " << std::hex << std::setw(8) << std::setfill('0') << ((static_cast<uint32_t>(test_ip3rd_T1right) << 16) | (static_cast<uint32_t>(test_ip4th_T1right) << 8) | test_ch_T1right) << std::dec << std::endl;
-    std::cout << "  name: " << std::hex << std::setw(8) << std::setfill('0') << det_item_T1right->name << ",which is \"" << static_cast<char>((det_item_T1right->name >> 24) & 0xFF) << static_cast<char>((det_item_T1right->name >> 16) & 0xFF) << static_cast<char>((det_item_T1right->name >> 8) & 0xFF) << static_cast<char>(det_item_T1right->name & 0xFF) << "\" in char"<< std::endl;
-    std::cout << "  plane: " << std::hex << std::setw(4) << std::setfill('0') << det_item_T1right->plane << ",which is \"" << static_cast<char>((det_item_T1right->plane >> 8) & 0xFF) << static_cast<char>(det_item_T1right->plane & 0xFF) << "\" in char" << std::endl;
-    std::cout << "  segment: " << static_cast<uint32_t>(det_item_T1right->segment) << std::endl;
-    std::cout << "  channel: " << std::hex << std::setw(8) << std::setfill('0') << det_item_T1right->channel << ",which is \"" << static_cast<char>((det_item_T1right->channel >> 24) & 0xFF) << static_cast<char>((det_item_T1right->channel >> 16) & 0xFF) << static_cast<char>((det_item_T1right->channel >> 8) & 0xFF) << static_cast<char>(det_item_T1right->channel & 0xFF) << "\" in char" << std::dec << std::endl;
+    if(det_item_T1right != nullptr) {
+        channel_map_simple.printDETinfo( *det_item_T1right );
+    } else {
+        std::cout << "\tDET item not found for the given FE id." << std::endl;
+    }
 
     auto t0 = std::chrono::high_resolution_clock::now();
     const int n_trials = 1000000;
