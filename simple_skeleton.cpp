@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
     std::cout << "  name: " << std::hex << std::setw(8) << std::setfill('0') << det_item_T1right.name << ",which is \"" << static_cast<char>((det_item_T1right.name >> 24) & 0xFF) << static_cast<char>((det_item_T1right.name >> 16) & 0xFF) << static_cast<char>((det_item_T1right.name >> 8) & 0xFF) << static_cast<char>(det_item_T1right.name & 0xFF) << "\" in char"<< std::endl;
     std::cout << "  plane: " << std::hex << std::setw(4) << std::setfill('0') << det_item_T1right.plane << ",which is \"" << static_cast<char>((det_item_T1right.plane >> 8) & 0xFF) << static_cast<char>(det_item_T1right.plane & 0xFF) << "\" in char" << std::endl;
     std::cout << "  segment: " << static_cast<uint32_t>(det_item_T1right.segment) << std::endl;
-    std::cout << "  channel: " << std::hex << std::setw(8) << std::setfill('0') << det_item_T1right.channel << ",which is \"" << static_cast<char>((det_item_T1right.channel >> 24) & 0xFF) << static_cast<char>((det_item_T1right.channel >> 16) & 0xFF) << static_cast<char>((det_item_T1right.channel >> 8) & 0xFF) << static_cast<char>(det_item_T1right.channel & 0xFF) << "\" in char" << std::endl;
+    std::cout << "  channel: " << std::hex << std::setw(8) << std::setfill('0') << det_item_T1right.channel << ",which is \"" << static_cast<char>((det_item_T1right.channel >> 24) & 0xFF) << static_cast<char>((det_item_T1right.channel >> 16) & 0xFF) << static_cast<char>((det_item_T1right.channel >> 8) & 0xFF) << static_cast<char>(det_item_T1right.channel & 0xFF) << "\" in char" << std::dec << std::endl;
 
     auto t0 = std::chrono::high_resolution_clock::now();
     const int n_trials = 1000000;
