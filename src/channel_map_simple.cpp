@@ -41,6 +41,20 @@ channel-mapをもとに、インプットとアウトプットの形式の自由
             uint8_t parse_to8(const std::string& token);
 */
 namespace chmap {
+    // ChannelMapSimple::ChannelMapSimple() : 
+    //     fItemsFE(),
+    //     fItemsDET()
+    // {
+    // }
+    
+    ChannelMapSimple& ChannelMapSimple::get_instance() {
+        static ChannelMapSimple instance;
+        return instance;
+    }// ChannelMapSimple& ChannelMapSimple::get_instance()
+    ChannelMapSimple::~ChannelMapSimple() {
+        // destructor
+    }// ChannelMapSimple::~ChannelMapSimple()
+    
     void ChannelMapSimple::initialize(const std::string& file_path) {
         simplify_detector_names(); // prepare detname_simplify_map
         std::ifstream file(file_path);
@@ -64,6 +78,7 @@ namespace chmap {
                 }
             }
         }// if getline(file, line) for loeading header
+
         // load mapdata lines
         while (std::getline(file, line)) {
             if(line.back() == '\r'){ // for Windwos-style line ending
@@ -79,7 +94,23 @@ namespace chmap {
             channel_map_simple_items.push_back(item);
         }// while getline(file, line) for loading mapdata
 
+        // sort channel_map_simple_items by fe.id
+        std::sort(channel_map_simple_items.begin(), channel_map_simple_items.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
+            return left.fe.id < right.fe.id;
+        });
+
+        std::vector<ChannelMapSimpleItem_FE> fe_items;
+        std::vector<ChannelMapSimpleItem_DET> det_items;
+        for(const auto& item : channel_map_simple_items){
+            fe_items.push_back(item.fe);
+            det_items.push_back(item.det);
+        }
+        fItemsFE = fe_items;
+        fItemsDET = det_items;
+        channel_map_simple_items.clear();
+
     }// void ChannelMapSimple::initialize
+
     std::vector<std::string> ChannelMapSimple::split_line(const std::string& line, char delimiter) {
         std::vector<std::string> tokens;
         std::string token;
@@ -89,6 +120,7 @@ namespace chmap {
         }
         return tokens;
     }// std::vector<std::string> ChannelMapSimple::split_line
+
     ChannelMapSimpleItem ChannelMapSimple::makeSimpleItem(const std::vector<std::string>& tokens) {
         int len_tokens = tokens.size();
         uint64_t fe_ip_full;
@@ -242,4 +274,20 @@ namespace chmap {
             }
         }
     }// uint16_t ChannelMapSimple::parse_to16
+
+    auto ChannelMapSimple::getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
+        uint32_t id = (uint32_t(ip3rd) << 24) | (uint32_t(ip4th) << 16) | uint32_t(ch);
+        // binary search in fItemsFE
+        auto it = std::lower_bound(fItemsFE.begin(), fItemsFE.end(), id);
+        if(it != fItemsFE.end() && it->id == id) {
+            return std::distance(fItemsFE.begin(), it);
+        } else {
+            std::cerr << "FE id not found: " << id << std::endl;
+        }
+    }// auto ChannelMapSimple::getFERank
+
+    ChannelMapSimpleItem_DET& ChannelMapSimple::getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
+        auto rank = getFERank(ip3rd, ip4th, ch);
+        return fItemsDET[rank];
+    }// ChannelMapSimpleItem_DET& ChannelMapSimple::getDETItem
 }// namespace chmap

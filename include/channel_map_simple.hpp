@@ -14,13 +14,21 @@ namespace chmap {
             ~ChannelMapSimple();
 
             void initialize(const std::string& file_path);
-            std::vector<ChannelMapSimpleItem> ChannelMapSimple::channel_map_simple_items;
+            std::vector<ChannelMapSimpleItem> channel_map_simple_items;
             std::unordered_map<std::string, uint32_t> mapdata_string_simplify_map32;
             std::unordered_map<std::string, uint16_t> mapdata_string_simplify_map16;
+            std::vector<ChannelMapSimpleItem_FE> fItemsFE;
+            std::vector<ChannelMapSimpleItem_DET> fItemsDET;
+
+            ChannelMapSimpleItem_DET& getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
+
+            ChannelMapSimple(const ChannelMapSimple&) = delete; // prevent copy constructor
+            ChannelMapSimple& operator=(const ChannelMapSimple&) = delete; // prevent copy assignment
         private:
             std::vector<std::string> split_line(const std::string& line, char delimiter = ',');
             std::vector<std::string> m_header, m_element_type, m_unique_types;
             ChannelMapSimpleItem makeSimpleItem(const std::vector<std::string>& tokens);
+            auto getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
             void simplify_detector_names();
             uint32_t four_char_to_uint32(char a, char b, char c, char d);
             uint16_t four_char_to_uint16(char a, char b);
@@ -28,9 +36,11 @@ namespace chmap {
             uint32_t parse_to32(const std::string& token);
             uint16_t parse_to16(const std::string& token);
             uint8_t parse_to8(const std::string& token);
-
-
             
+
+            ChannelMapSimple() = default; // private default constructor
+
+
     };// class ChannelMapSimple
 }// namespace chmap
 
