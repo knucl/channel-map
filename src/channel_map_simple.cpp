@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cctype>
 
+#include <optional>
+
 #define DEBUG_PRINT 0
 
 
@@ -409,7 +411,7 @@ namespace chmap {
         }
     }// uint8_t ChannelMapSimple::parse_to8
 
-    auto ChannelMapSimple::getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
+    size_t ChannelMapSimple::getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
         uint32_t id = (uint32_t(ip3rd) << 24) | (uint32_t(ip4th) << 16) | uint32_t(ch);
         // binary search in fItemsFE, 
         auto it = std::lower_bound(fItemsFE.begin(), fItemsFE.end(), id,
@@ -420,15 +422,18 @@ namespace chmap {
         if(it != fItemsFE.end() && it->id == id) {
             return std::distance(fItemsFE.begin(), it);
         } else {
-            std::cerr << "\t[in getFERank] FE id not found: " << std::hex << static_cast<uint32_t>(id) << std::endl;
-            std::exit(1);
+            return std::string::npos; // not found
         }
-    }// auto ChannelMapSimple::getFERank
+    }// size_t ChannelMapSimple::getFERank
 
-    ChannelMapSimpleItem_DET& ChannelMapSimple::getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
+    ChannelMapSimpleItem_DET* ChannelMapSimple::getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
         auto rank = getFERank(ip3rd, ip4th, ch);
-        return fItemsDET[rank];
-    }// ChannelMapSimpleItem_DET& ChannelMapSimple::getDETItem
+        if(rank != std::string::npos) {
+            return &fItemsDET[rank];
+        } else {
+            return nullptr; // not found
+        }
+    }// ChannelMapSimpleItem_DET* ChannelMapSimple::getDETItem
 
     void ChannelMapSimple::printAllItemsFE() {
         std::cout << "FE items count: " << fItemsFE.size() << std::endl;

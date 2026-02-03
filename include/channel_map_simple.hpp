@@ -5,6 +5,7 @@
 #include <string>
 #include <filesystem>
 #include <unordered_map>
+// #include <optional>
 #include "channel_map_simple_item.hpp"
 
 namespace chmap {
@@ -21,7 +22,7 @@ namespace chmap {
             std::vector<ChannelMapSimpleItem_FE> fItemsFE;
             std::vector<ChannelMapSimpleItem_DET> fItemsDET;
 
-            ChannelMapSimpleItem_DET& getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
+            ChannelMapSimpleItem_DET* getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
             void printAllItemsFE();
             void printAllItemsDET();
             void checkDuplicateFEIDs();
@@ -32,7 +33,7 @@ namespace chmap {
             std::vector<std::string> split_line(const std::string& line, char delimiter = ',');
             std::vector<std::string> m_header, m_element_type, m_unique_types;
             ChannelMapSimpleItem makeSimpleItem(const std::vector<std::string>& tokens);
-            auto getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
+            std::size_t getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
             void simplify_detector_names();
             uint32_t four_char_to_uint32(char a, char b, char c, char d);
             uint16_t four_char_to_uint16(char a, char b);
