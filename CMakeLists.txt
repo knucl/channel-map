@@ -86,11 +86,17 @@ add_executable(speedtest speedtest.cpp)
 target_compile_features(speedtest PRIVATE cxx_std_17)
 target_link_libraries(speedtest PRIVATE channel-map ${FILESYSTEM_LIB})
 
+### simple skeleton
+add_executable(simple-skeleton-program simple_skeleton.cpp)
+target_compile_features(simple-skeleton-program PRIVATE cxx_std_17)
+target_link_libraries(simple-skeleton-program PRIVATE channel-map ${FILESYSTEM_LIB})
+
 ### install
 install(DIRECTORY include/ DESTINATION include)
 install(TARGETS skeleton-program DESTINATION bin)
 install(TARGETS fat-skeleton-program DESTINATION bin)
 install(TARGETS speedtest DESTINATION bin)
+install(TARGETS simple-skeleton-program DESTINATION bin)
 install(TARGETS channel-map EXPORT ChannelMapTargets DESTINATION lib)
 install(FILES ${HEADERS} DESTINATION include)
 install(FILES ${SCRIPT_SOURCE} DESTINATION bin
