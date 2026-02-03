@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     chmap::ChannelMap& channel_map = chmap::ChannelMap::get_instance();
     channel_map.initialize(input_file_path);
     chmap::ChannelTuple test_det1("utof", 0, 0, "right", 0);
-    chmap::ChannelTuple test_det2("t0", 0, 0, "left", 0);
+    chmap::ChannelTuple test_det2("t0", 0, 0, "top", 0);
     chmap::ChannelTuple test_det3("bdc", "X", 1, 1, 0);
     const auto& fe1 = channel_map.get("fe", test_det1);
     const auto& fe2 = channel_map.get("fe", test_det2);
