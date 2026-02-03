@@ -4,8 +4,9 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
-#define DEBUG_PRINT 1
+#define DEBUG_PRINT 0
 
 
 /*
@@ -133,6 +134,15 @@ namespace chmap {
                 continue;
             }
             ChannelMapSimpleItem item = makeSimpleItem(tokens);
+            #if DEBUG_PRINT
+            std::cout << "  made ChannelMapSimpleItem: " << std::endl;
+            std::cout << "    FE id: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.fe.id << std::dec << std::endl;
+            std::cout << "    DET name: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.det.name << std::dec
+                      << ", plane: 0x" << std::hex << std::setw(4) << std::setfill('0') << item.det.plane << std::dec
+                      << ", segment: " << static_cast<uint32_t>(item.det.segment)
+                      << ", channel: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.det.channel << std::dec
+                      << std::endl;
+            #endif
             channel_map_simple_items.push_back(item);
         }// while getline(file, line) for loading mapdata
         #if DEBUG_PRINT
@@ -180,7 +190,7 @@ namespace chmap {
     ChannelMapSimpleItem ChannelMapSimple::makeSimpleItem(const std::vector<std::string>& tokens) {
         int len_tokens = tokens.size();
         uint64_t fe_ip_full;
-        uint32_t fe_ip_3rd_4th;
+        uint16_t fe_ip_3rd_4th;
         uint16_t fe_channel;
         uint32_t det_name;
         uint16_t det_plane;
@@ -207,16 +217,16 @@ namespace chmap {
                 if(fe_count == 0) {
                     #if DEBUG_PRINT
                     std::cout << "parsing token(fe_count == 0): " << tokens[i] << " (string)" << std::endl;
-                    std::cout << "This token is interpreted as full FE IP address in uint64_t format " << std::hex << std::stoull(tokens[i]) << std::dec << std::endl;
+                    std::cout << "This token is interpreted as full FE IP address in uint64_t format " << std::hex << std::stoull(tokens[i], nullptr, 0) << std::dec << std::endl;
                     #endif
-                    fe_ip_full = static_cast<uint64_t>(std::stoull(tokens[i]));
-                    fe_ip_3rd_4th = parse_to32(
-                        std::to_string( (fe_ip_full >> 16) & 0xFFFF )
+                    fe_ip_full = static_cast<uint64_t>(std::stoull(tokens[i], nullptr, 0));
+                    fe_ip_3rd_4th = parse_to16(
+                        std::to_string( (fe_ip_full) & 0xFFFF )
                     );
                 } else if(fe_count == 1) {
                     #if DEBUG_PRINT
                     std::cout << "parsing token(fe_count == 1): " << tokens[i] << " (string)" << std::endl;
-                    std::cout << "This token is interpreted as FE channel in uint16_t format " << std::stoul(tokens[i]) << std::endl;
+                    std::cout << "This token is interpreted as FE channel in uint16_t format " << std::stoul(tokens[i], nullptr, 0) << std::endl;
                     #endif
                     fe_channel = parse_to16(tokens[i]);
                 }
@@ -299,10 +309,14 @@ namespace chmap {
             {"t1", "T1  "},
             {"all_charged", "ALCH"},
             {"bftref", "BFTR"},
+            {"bht", "BHT "},
+            {"bft", "BFT "},
+            {"sft", "SFT "},
             {"bdc", "BDC "},
             {"kldc", "KLDC"},
             {"left", "LEFT"},
             {"right", "RIGT"},
+            {"top", "TOP "},
             {"bottom", "BOTM"},
             {"upstream", "UPST"},
             {"downstream", "DOST"},
@@ -356,7 +370,7 @@ namespace chmap {
     uint32_t ChannelMapSimple::parse_to32(const std::string& token) {
         // assuming token is for example "0", "utof", "t0", "all_charged", "200", and parse to "00000000", "55544F46", "54302020", "414C4348", "000000C8" respectively
         if (isTokenNumeric(token)) {
-            return static_cast<uint32_t>(std::stoul(token));
+            return static_cast<uint32_t>(std::stoul(token, nullptr, 0));
         } else {
             auto it = mapdata_string_simplify_map32.find(token);// check in detname_simplify_map
             if(it == mapdata_string_simplify_map32.end()) {
@@ -371,7 +385,7 @@ namespace chmap {
 
     uint16_t ChannelMapSimple::parse_to16(const std::string& token) {
         if (isTokenNumeric(token)) {
-            return static_cast<uint16_t>(std::stoul(token));
+            return static_cast<uint16_t>(std::stoul(token, nullptr, 0));
         } else {
             auto it = mapdata_string_simplify_map16.find(token);// check in detname_simplify_map
             if(it == mapdata_string_simplify_map16.end()) {
@@ -384,14 +398,28 @@ namespace chmap {
         }
     }// uint16_t ChannelMapSimple::parse_to16
 
+    uint8_t ChannelMapSimple::parse_to8(const std::string& token) {
+        if (isTokenNumeric(token)) {
+            return static_cast<uint8_t>(std::stoul(token, nullptr, 0));
+        } else {
+            std::cerr << "unknown token for uint8_t conversion: " << token << std::endl;
+            std::exit(1);
+        }
+    }// uint8_t ChannelMapSimple::parse_to8
+
     auto ChannelMapSimple::getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
         uint32_t id = (uint32_t(ip3rd) << 24) | (uint32_t(ip4th) << 16) | uint32_t(ch);
-        // binary search in fItemsFE
-        auto it = std::lower_bound(fItemsFE.begin(), fItemsFE.end(), id);
+        // binary search in fItemsFE, 
+        auto it = std::lower_bound(fItemsFE.begin(), fItemsFE.end(), id,
+            [](const ChannelMapSimpleItem_FE& item, uint32_t value) {
+                return item.id < value;
+            }
+        );
         if(it != fItemsFE.end() && it->id == id) {
             return std::distance(fItemsFE.begin(), it);
         } else {
-            std::cerr << "FE id not found: " << id << std::endl;
+            std::cerr << "\t[in getFERank] FE id not found: " << std::hex << static_cast<uint32_t>(id) << std::endl;
+            std::exit(1);
         }
     }// auto ChannelMapSimple::getFERank
 
@@ -399,4 +427,40 @@ namespace chmap {
         auto rank = getFERank(ip3rd, ip4th, ch);
         return fItemsDET[rank];
     }// ChannelMapSimpleItem_DET& ChannelMapSimple::getDETItem
+
+    void ChannelMapSimple::printAllItemsFE() {
+        std::cout << "FE items count: " << fItemsFE.size() << std::endl;
+        std::cout << "All FE Items:" << std::endl;
+        for(const auto& item : fItemsFE) {
+            std::cout << "  FE id: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.id << std::dec << std::endl;
+        }
+    }// void ChannelMapSimple::printAllItemsFE
+    void ChannelMapSimple::printAllItemsDET() {
+        std::cout << "DET items count: " << fItemsDET.size() << std::endl;
+        std::cout << "All DET Items:" << std::endl;
+        for(const auto& item : fItemsDET) {
+            std::cout << "  DET name: " << std::hex << std::setw(8) << std::setfill('0') << item.name << std::dec
+                      << ", plane: " << std::hex << std::setw(8) << std::setfill('0') << item.plane << std::dec
+                      << ", segment: " << static_cast<uint32_t>(item.segment)
+                      << ", channel: " << std::hex << std::setw(8) << std::setfill('0') << item.channel << std::dec
+                      << std::endl;
+        }
+    }// void ChannelMapSimple::printAllItemsDET
+
+    void ChannelMapSimple::checkDuplicateFEIDs() {
+        std::cout << "\n[checkDuplicateFEIDs] checking sequence of FE IDs for duplicates..." << std::endl;
+        for(const auto& item : fItemsFE) {
+            auto range = std::equal_range(fItemsFE.begin(), fItemsFE.end(), item,
+                [](const ChannelMapSimpleItem_FE& left, const ChannelMapSimpleItem_FE& right) {
+                    return left.id < right.id;
+                }
+            );
+            size_t count = std::distance(range.first, range.second);
+            if(count > 1) {
+                std::cerr << "\tduplicate FE id found: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.id << std::dec
+                          << ", count: " << count << std::endl;
+            }
+        }
+        std::cout << "[checkDuplicateFEIDs] check completed." << std::endl;
+    }// void ChannelMapSimple::checkDuplicateFEIDs
 }// namespace chmap

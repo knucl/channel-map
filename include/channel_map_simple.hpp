@@ -5,6 +5,7 @@
 #include <string>
 #include <filesystem>
 #include <unordered_map>
+#include "channel_map_simple_item.hpp"
 
 namespace chmap {
 
@@ -21,6 +22,9 @@ namespace chmap {
             std::vector<ChannelMapSimpleItem_DET> fItemsDET;
 
             ChannelMapSimpleItem_DET& getDETItem(uint8_t ip3rd, uint8_t ip4th, uint16_t ch);
+            void printAllItemsFE();
+            void printAllItemsDET();
+            void checkDuplicateFEIDs();
 
             ChannelMapSimple(const ChannelMapSimple&) = delete; // prevent copy constructor
             ChannelMapSimple& operator=(const ChannelMapSimple&) = delete; // prevent copy assignment
