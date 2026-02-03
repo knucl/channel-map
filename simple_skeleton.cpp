@@ -7,6 +7,8 @@
 #include <debug_print.hpp>
 #include <channel_tuple.hpp>
 #include <element.hpp>
+#include <cstdlib>
+#include <variant>
 
 #include <chrono>
 
@@ -32,6 +34,19 @@ int main(int argc, char* argv[]) {
     std::cout << "  for det: " << test_det1 << ", fe: " << fe1 << std::endl;
     std::cout << "  for det: " << test_det2 << ", fe: " << fe2 << std::endl;
     std::cout << "  for det: " << test_det3 << ", fe: " << fe3 << std::endl;
+    uint64_t fe1_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe1["id"]));
+    uint16_t fe1_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe1["channel"]));
+    uint64_t fe2_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe2["id"]));
+    uint16_t fe2_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe2["channel"]));
+    uint64_t fe3_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe3["id"]));
+    uint16_t fe3_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe3["channel"]));
+
+    uint8_t fe1_ip4th = static_cast<uint8_t>((fe1_id) & 0xFF);
+    uint8_t fe1_ip3rd = static_cast<uint8_t>((fe1_id >> 8) & 0xFF);
+    uint8_t fe2_ip4th = static_cast<uint8_t>((fe2_id) & 0xFF);
+    uint8_t fe2_ip3rd = static_cast<uint8_t>((fe2_id >> 8) & 0xFF);
+    uint8_t fe3_ip4th = static_cast<uint8_t>((fe3_id) & 0xFF);
+    uint8_t fe3_ip3rd = static_cast<uint8_t>((fe3_id >> 8) & 0xFF);
     #endif
 
     std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized." << std::endl;
@@ -67,6 +82,61 @@ int main(int argc, char* argv[]) {
     auto t1 =  std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::micro> elapsed = t1 - t0;
     std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "Average time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+
+    #if general_chmap
+    t0 = std::chrono::high_resolution_clock::now();
+    for(int i=0; i<n_trials; i++) {
+        chmap::ChannelMapSimpleItem_DET& det_item = channel_map_simple.getDETItem(fe1_ip3rd, fe1_ip4th, fe1_channel);
+        det_name = det_item.name;
+        det_plane = det_item.plane;
+        det_segment = det_item.segment;
+        det_channel = det_item.channel;
+    }
+    t1 =  std::chrono::high_resolution_clock::now();
+    elapsed = t1 - t0;
+    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using General ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
+    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+
+    t0 = std::chrono::high_resolution_clock::now();
+    for(int i=0; i<n_trials; i++) {
+        chmap::ChannelMapSimpleItem_DET& det_item = channel_map_simple.getDETItem(fe2_ip3rd, fe2_ip4th, fe2_channel);
+        det_name = det_item.name;
+        det_plane = det_item.plane;
+        det_segment = det_item.segment;
+        det_channel = det_item.channel;
+    }
+    t1 =  std::chrono::high_resolution_clock::now();
+    elapsed = t1 - t0;
+    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using General ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
+    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+
+    t0 = std::chrono::high_resolution_clock::now();
+    for(int i=0; i<n_trials; i++) {
+        chmap::ChannelMapSimpleItem_DET& det_item = channel_map_simple.getDETItem(fe3_ip3rd, fe3_ip4th, fe3_channel);
+        det_name = det_item.name;
+        det_plane = det_item.plane;
+        det_segment = det_item.segment;
+        det_channel = det_item.channel;
+    }
+    t1 =  std::chrono::high_resolution_clock::now();
+    elapsed = t1 - t0;
+    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using General ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
+    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+
+    t0 = std::chrono::high_resolution_clock::now();
+    for(int i=0; i<n_trials; i++) {
+        chmap::ChannelMapSimpleItem_DET& det_item = channel_map_simple.getDETItem(0xFF, 0xFF, 0xFFFF);
+        det_name = det_item.name;
+        det_plane = det_item.plane;
+        det_segment = det_item.segment;
+        det_channel = det_item.channel;
+    }
+    t1 =  std::chrono::high_resolution_clock::now();
+    elapsed = t1 - t0;
+    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using General ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
+    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+
+    #endif
     return 0;
 }
