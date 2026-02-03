@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+#define DEBUG_PRINT 1
+
 
 /*
 channel-mapをもとに、インプットとアウトプットの形式の自由度を減らすことにより、機能を限定し、処理の高速化を図る、channel-map-simpleの実装。
@@ -57,10 +59,26 @@ namespace chmap {
     
     void ChannelMapSimple::initialize(const std::string& file_path) {
         simplify_detector_names(); // prepare detname_simplify_map
+        #if DEBUG_PRINT
+        std::cout << "str simplify map32:" << std::endl;
+        for(const auto& pair : mapdata_string_simplify_map32){
+            std::cout << "  " << pair.first << " -> " << std::hex << pair.second << std::dec << std::endl;
+        }
+        std::cout << "str simplify map16:" << std::endl;
+        for(const auto& pair : mapdata_string_simplify_map16){
+            std::cout << "  " << pair.first << " -> " << std::hex << pair.second << std::dec << std::endl;
+        }
+        #endif
+
+
         std::ifstream file(file_path);
         if (!file.is_open()) {
             std::cerr << "file open fail : " << file_path << std::endl;
             std::exit(1);
+        }else {
+            #if DEBUG_PRINT
+            std::cout << "file opened: " << file_path << std::endl;
+            #endif
         }
 
         std::string line;
@@ -68,7 +86,7 @@ namespace chmap {
             // load header, as template, assuming "fe.id, fe.channel, fe.data, detector.id, detector.plane, detector.segment, detector.channel, detector.data"
             for(const auto& header_part : split_line(line)) {
                 if (std::count(m_header.begin(), m_header.end(), header_part) > 0) {
-                    std::cerr << "found duplicate header : " << header_part << std::endl;
+                    std::cerr << "found duplicate header column : " << header_part << std::endl;
                 }
                 m_header.push_back(header_part);
                 auto type = split_line(header_part, '.')[0];
@@ -77,13 +95,37 @@ namespace chmap {
                     m_unique_types.push_back(type);
                 }
             }
+            #if DEBUG_PRINT
+            std::cout << "header loaded: ";
+            for(const auto& h : m_header){
+                std::cout << h << ", ";
+            }
+            std::cout << std::endl;
+            std::cout << "element types: ";
+            for(const auto& t : m_element_type){
+                std::cout << t << ", ";
+            }
+            std::cout << std::endl;
+            #endif
         }// if getline(file, line) for loeading header
+        #if DEBUG_PRINT
+        std::cout << "header loaded" << std::endl;
+        #endif
+        #if DEBUG_PRINT
+        std::cout << "start loading mapdata lines" << std::endl;
+        #endif
 
         // load mapdata lines
         while (std::getline(file, line)) {
             if(line.back() == '\r'){ // for Windwos-style line ending
-            line.pop_back();
+                #if DEBUG_PRINT
+                std::cout << "found Windows-style line ending" << std::endl;
+                #endif
+                line.pop_back();
             }
+            #if DEBUG_PRINT
+            std::cout << "loading line: " << line << std::endl;
+            #endif
 
             auto tokens = split_line(line);
             if (tokens.size() != m_header.size()) {
@@ -93,11 +135,21 @@ namespace chmap {
             ChannelMapSimpleItem item = makeSimpleItem(tokens);
             channel_map_simple_items.push_back(item);
         }// while getline(file, line) for loading mapdata
+        #if DEBUG_PRINT
+        std::cout << "finished loading mapdata lines" << std::endl;
+        std::cout << "total loaded items: " << channel_map_simple_items.size() << std::endl;
+        #endif
 
+        #if DEBUG_PRINT
+        std::cout << "start sorting channel_map_simple_items by fe.id" << std::endl;
+        #endif
         // sort channel_map_simple_items by fe.id
         std::sort(channel_map_simple_items.begin(), channel_map_simple_items.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
             return left.fe.id < right.fe.id;
         });
+        #if DEBUG_PRINT
+        std::cout << "finished sorting channel_map_simple_items" << std::endl;
+        #endif
 
         std::vector<ChannelMapSimpleItem_FE> fe_items;
         std::vector<ChannelMapSimpleItem_DET> det_items;
@@ -108,6 +160,10 @@ namespace chmap {
         fItemsFE = fe_items;
         fItemsDET = det_items;
         channel_map_simple_items.clear();
+
+        #if DEBUG_PRINT
+        std::cout << "initialized ChannelMapSimple with " << fItemsFE.size() << " items." << std::endl;
+        #endif
 
     }// void ChannelMapSimple::initialize
 
@@ -138,16 +194,30 @@ namespace chmap {
         int fe_count = 0;
         int det_magic = 5; // id, plane, segment, channel, data
         int det_count = 0;
+        #if DEBUG_PRINT
+        std::cout << "making ChannelMapSimpleItem from tokens:" << std::endl;
+        for(const auto& t : tokens){
+            std::cout << "  " << t << std::endl;
+        }
+        #endif
         for(int i=0; i<len_tokens; ++i) {
             std::string type = m_element_type[i];
             if(type == "fe") {
                 // parse front-end related tokens
                 if(fe_count == 0) {
+                    #if DEBUG_PRINT
+                    std::cout << "parsing token(fe_count == 0): " << tokens[i] << " (string)" << std::endl;
+                    std::cout << "This token is interpreted as full FE IP address in uint64_t format " << std::hex << std::stoull(tokens[i]) << std::dec << std::endl;
+                    #endif
                     fe_ip_full = static_cast<uint64_t>(std::stoull(tokens[i]));
                     fe_ip_3rd_4th = parse_to32(
                         std::to_string( (fe_ip_full >> 16) & 0xFFFF )
                     );
                 } else if(fe_count == 1) {
+                    #if DEBUG_PRINT
+                    std::cout << "parsing token(fe_count == 1): " << tokens[i] << " (string)" << std::endl;
+                    std::cout << "This token is interpreted as FE channel in uint16_t format " << std::stoul(tokens[i]) << std::endl;
+                    #endif
                     fe_channel = parse_to16(tokens[i]);
                 }
                 fe_count++;
@@ -156,14 +226,46 @@ namespace chmap {
                 if(det_count == 0) {
                     det_name_str = tokens[i];
                     det_name = parse_to32(det_name_str);
+                    #if DEBUG_PRINT
+                    std::cout << "parsing token(det_count == 0): " << tokens[i] << " (string)" << std::endl;
+                    std::cout << "This token is interpreted as detector name in uint32_t format " << std::hex << det_name << std::dec << std::endl;
+                    std::cout << "This uint32_t corresponds to chars: "
+                              << char((det_name >> 24) & 0xFF)
+                              << char((det_name >> 16) & 0xFF)
+                              << char((det_name >> 8) & 0xFF)
+                              << char(det_name & 0xFF)
+                              << std::endl;
+                    #endif
                 } else if(det_count == 1) {
                     det_plane_str = tokens[i];
                     det_plane = parse_to16(det_plane_str);
+                    #if DEBUG_PRINT
+                    std::cout << "parsing token(det_count == 1): " << tokens[i] << " (string)" << std::endl;
+                    std::cout << "This token is interpreted as detector plane in uint16_t format " << std::hex << det_plane << std::dec << std::endl;
+                    std::cout << "This uint16_t corresponds to chars: "
+                              << char((det_plane >> 8) & 0xFF)
+                              << char(det_plane & 0xFF)
+                              << std::endl;
+                    #endif
                 } else if(det_count == 2) {
                     det_segment = parse_to8(tokens[i]);
+                    #if DEBUG_PRINT
+                    std::cout << "parsing token(det_count == 2): " << tokens[i] << " (string)" << std::endl;
+                    std::cout << "This token is interpreted as detector segment in uint8_t format " << static_cast<uint32_t>(det_segment) << std::endl;
+                    #endif
                 } else if(det_count == 3) {
                     det_channel_str = tokens[i];
                     det_channel = parse_to32(det_channel_str);
+                    #if DEBUG_PRINT
+                    std::cout << "parsing token(det_count == 3): " << tokens[i] << " (string)" << std::endl;
+                    std::cout << "This token is interpreted as detector channel in uint32_t format " << std::hex << det_channel << std::dec << std::endl;
+                    std::cout << "This uint32_t corresponds to chars: "
+                              << char((det_channel >> 24) & 0xFF)
+                              << char((det_channel >> 16) & 0xFF)
+                              << char((det_channel >> 8) & 0xFF)
+                              << char(det_channel & 0xFF)
+                              << std::endl;
+                    #endif
                 }
                 det_count++;
             } // if type is fe or detector
@@ -175,6 +277,13 @@ namespace chmap {
         det_item.plane = det_plane;
         det_item.segment = det_segment;
         det_item.channel = det_channel;
+        #if DEBUG_PRINT
+        std::cout << "constructed ChannelMapSimpleItem_FE: id=" << std::hex << fe_item.id << std::dec << std::endl;
+        std::cout << "constructed ChannelMapSimpleItem_DET: name=" << std::hex << det_item.name << std::dec
+                  << ", plane=" << std::hex << det_item.plane << std::dec
+                  << ", segment=" << static_cast<uint32_t>(det_item.segment)
+                  << ", channel=" << std::hex << det_item.channel << std::dec << std::endl;
+        #endif
         return ChannelMapSimpleItem{fe_item, det_item};
     }// ChannelMapSimpleItem ChannelMapSimple::makeSimpleItem
 
