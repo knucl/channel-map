@@ -27,20 +27,19 @@ int main(int argc, char* argv[]) {
     chmap::ChannelTuple test_det1("utof", 0, 0, "right", 0);
     chmap::ChannelTuple test_det2("t0", 0, 0, "left", 0);
     chmap::ChannelTuple test_det3("bdc", "X", 1, 1, 0);
-    chmap::ChannelTuple fe1 = channel_map.get("fe", test_det1);
-    chmap::ChannelTuple fe2 = channel_map.get("fe", test_det2);
-    chmap::ChannelTuple fe3 = channel_map.get("fe", test_det3);
+    const auto& fe1 = channel_map.get("fe", test_det1);
+    const auto& fe2 = channel_map.get("fe", test_det2);
+    const auto& fe3 = channel_map.get("fe", test_det3);
     std::cout << "\n[in simple_skeleton.cpp] General ChannelMap results:" << std::endl;
     std::cout << "  for det: " << test_det1 << ", fe: " << fe1 << std::endl;
     std::cout << "  for det: " << test_det2 << ", fe: " << fe2 << std::endl;
     std::cout << "  for det: " << test_det3 << ", fe: " << fe3 << std::endl;
-    uint64_t fe1_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe1["id"]));
-    uint16_t fe1_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe1["channel"]));
-    uint64_t fe2_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe2["id"]));
-    uint16_t fe2_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe2["channel"]));
-    uint64_t fe3_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe3["id"]));
-    uint16_t fe3_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe3["channel"]));
-
+    uint64_t fe1_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe1[0]));
+    uint16_t fe1_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe1[1]));
+    uint64_t fe2_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe2[0]));
+    uint16_t fe2_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe2[1]));
+    uint64_t fe3_id = static_cast<uint64_t>(std::get<chmap::number_t>(fe3[0]));
+    uint16_t fe3_channel = static_cast<uint16_t>(std::get<chmap::number_t>(fe3[1]));
     uint8_t fe1_ip4th = static_cast<uint8_t>((fe1_id) & 0xFF);
     uint8_t fe1_ip3rd = static_cast<uint8_t>((fe1_id >> 8) & 0xFF);
     uint8_t fe2_ip4th = static_cast<uint8_t>((fe2_id) & 0xFF);
@@ -85,6 +84,7 @@ int main(int argc, char* argv[]) {
     std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
 
     #if general_chmap
+    std::cout << "\n[in simple_skeleton.cpp] Now testing getDETItem for several FE ids obtained from General ChannelMap." << std::endl;
     t0 = std::chrono::high_resolution_clock::now();
     for(int i=0; i<n_trials; i++) {
         chmap::ChannelMapSimpleItem_DET& det_item = channel_map_simple.getDETItem(fe1_ip3rd, fe1_ip4th, fe1_channel);
