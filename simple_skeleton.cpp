@@ -57,106 +57,106 @@ int main(int argc, char* argv[]) {
     // channel_map_simple.printAllItemsDET();
     channel_map_simple.checkDuplicateFEIDs();
 
+    // test t1 right channel
     uint8_t test_ip3rd_T1right = 0x02;
     uint8_t test_ip4th_T1right = 0xAA;
     uint16_t test_ch_T1right = 12;
+    // test utof left channel
+    uint8_t test_ip3rd_utof_left = 0x02;
+    uint8_t test_ip4th_utof_left = 0xA9;
+    uint16_t test_ch_utof_left = 8;
+    // test bdc 1 V plane channel 4
+    uint8_t test_ip3rd_bdc1 = 0x02;
+    uint8_t test_ip4th_bdc1 = 0xA1;
+    uint16_t test_ch_bdc1 = 32;
+    // test kldc 2 U' plane channel 16
+    uint8_t test_ip3rd_kldc2 = 0x02;
+    uint8_t test_ip4th_kldc2 = 0xB2;
+    uint16_t test_ch_kldc2 = 96;
 
-    std::cout << "\n[in simple_skeleton.cpp] Testing getDETItem for FE id of: " << std::endl;
-    channel_map_simple.printFEid( chmap::ChannelMapSimpleItem_FE(test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right) );
-    std::cout << "\tCorresponding DET info:" << std::endl;
-    chmap::ChannelMapSimpleItem_DET* det_item_T1right = channel_map_simple.getDETItem(test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right);
-    if(det_item_T1right != nullptr) {
-        channel_map_simple.printDETinfo( *det_item_T1right );
-    } else {
-        std::cout << "\tDET item not found for the given FE id." << std::endl;
-    }
 
-    auto t0 = std::chrono::high_resolution_clock::now();
-    const int n_trials = 1000000;
     uint32_t det_name;
     uint16_t det_plane;
     uint8_t det_segment;
     uint32_t det_channel;
-    for(int i=0; i<n_trials; i++) {
-        chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right);
-        det_name = det_item->name;
-        det_plane = det_item->plane;
-        det_segment = det_item->segment;
-        det_channel = det_item->channel;
+
+    std::vector<std::tuple<uint8_t, uint8_t, uint16_t, std::string>> test_items = {
+        {test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right, "T1 right channel"},
+        {test_ip3rd_utof_left, test_ip4th_utof_left, test_ch_utof_left, "utof left channel"},
+        {test_ip3rd_bdc1, test_ip4th_bdc1, test_ch_bdc1, "bdc 1 V plane channel 4"},
+        {test_ip3rd_kldc2, test_ip4th_kldc2, test_ch_kldc2, "kldc 2 U' plane channel 16"},
+        {0xFF, 0xFF, 0xFFFF, "non-existing channel"}
+    };
+
+    for(const auto& item : test_items) {
+        uint8_t ip3rd = std::get<0>(item);
+        uint8_t ip4th = std::get<1>(item);
+        uint16_t ch = std::get<2>(item);
+        const std::string& description = std::get<3>(item);
+        std::cout << "\n[in simple_skeleton.cpp] Testing getDETItem for FE id of " << description << ":" << std::endl;
+        channel_map_simple.printFEid(chmap::ChannelMapSimpleItem_FE(ip3rd, ip4th, ch));
+        std::cout << "\t\tCorresponding DET info:" << std::endl;
+        chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(ip3rd, ip4th, ch);
+        if(det_item != nullptr) {
+            channel_map_simple.printDETinfo( *det_item );
+            constexpr int ntrials = 1000000;
+            auto t0 = std::chrono::high_resolution_clock::now();
+            for(int i=0; i<ntrials; i++) {
+                chmap::ChannelMapSimpleItem_DET* det_item_inner = channel_map_simple.getDETItem(ip3rd, ip4th, ch);
+                // det_name = det_item_inner->name;
+                // det_plane = det_item_inner->plane;
+                // det_segment = det_item_inner->segment;
+                // det_channel = det_item_inner->channel;
+            }
+            auto t1 =  std::chrono::high_resolution_clock::now();
+            for(int i=0; i<ntrials; i++) {
+                chmap::ChannelMapSimpleItem_DET* det_item_inner;
+            }
+            auto t2 =  std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::micro> elapsed_subtract_overhead_loop = (t1 - t0) - (t2 - t1);
+            std::cout << "\tDET name: " << std::hex << std::setw(8) << std::setfill('0') << det_name << std::dec
+                      << ", plane: " << std::hex << std::setw(8) << std::setfill('0') << det_plane << std::dec
+                      << ", segment: " << static_cast<uint8_t>(det_segment)
+                      << ", channel: " << std::hex << std::setw(8) << std::setfill('0') << det_channel << std::dec
+                      << std::endl;
+            std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem in " << elapsed_subtract_overhead_loop.count() << " microseconds." << std::endl;
+            std::cout << "\tAverage time per getDETItem call: " << (elapsed_subtract_overhead_loop.count() / ntrials) << " microseconds." << std::endl;
+
+        } else {
+            std::cout << "\tDET item not found for the given FE id." << std::endl;
+        }
     }
-    auto t1 =  std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::micro> elapsed = t1 - t0;
-    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
 
     #if general_chmap
-    std::cout << "\n[in simple_skeleton.cpp] Now testing getDETItem for several FE ids obtained from simple ChannelMap." << std::endl;
-    t0 = std::chrono::high_resolution_clock::now();
-    for(int i=0; i<n_trials; i++) {
-        chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(fe1_ip3rd, fe1_ip4th, fe1_channel);
-        det_name = det_item->name;
-        det_plane = det_item->plane;
-        det_segment = det_item->segment;
-        det_channel = det_item->channel;
-    }
-    t1 =  std::chrono::high_resolution_clock::now();
-    elapsed = t1 - t0;
-    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using simple ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+    constexpr int n_trials = 1000000;
+    auto t0 = std::chrono::high_resolution_clock::now();
+    auto t1 =  std::chrono::high_resolution_clock::now();
+    auto t2 =  std::chrono::high_resolution_clock::now();
 
-    t0 = std::chrono::high_resolution_clock::now();
-    for(int i=0; i<n_trials; i++) {
-        chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(fe2_ip3rd, fe2_ip4th, fe2_channel);
-        det_name = det_item->name;
-        det_plane = det_item->plane;
-        det_segment = det_item->segment;
-        det_channel = det_item->channel;
-    }
-    t1 =  std::chrono::high_resolution_clock::now();
-    elapsed = t1 - t0;
-    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using simple ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+    std::chrono::duration<double, std::micro> elapsed_subtract_overhead_loop = (t1 - t0) - (t2 - t1);
 
+    std::string detector_id, detector_plane, detector_segment, detector_channel;
     t0 = std::chrono::high_resolution_clock::now();
     for(int i=0; i<n_trials; i++) {
-        chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(fe3_ip3rd, fe3_ip4th, fe3_channel);
-        det_name = det_item->name;
-        det_plane = det_item->plane;
-        det_segment = det_item->segment;
-        det_channel = det_item->channel;
+        chmap::ChannelTuple det = channel_map.get("detector", fe1);
+        // detector_id = std::get<std::string>(det[0]);
+        // detector_plane = std::get<std::string>(det[1]);
+        // detector_segment = std::get<std::string>(det[2]);
+        // detector_channel = std::get<std::string>(det[3]);
+        detector_id = static_cast<uint64_t>(std::get<chmap::number_t>(det[0]));
+        detector_plane = static_cast<uint64_t>(std::get<chmap::number_t>(det[1]));
+        detector_segment = static_cast<uint64_t>(std::get<chmap::number_t>(det[2]));
+        detector_channel = static_cast<uint64_t>(std::get<chmap::number_t>(det[3]));
     }
     t1 =  std::chrono::high_resolution_clock::now();
-    elapsed = t1 - t0;
-    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using simple ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+    for(int i=0; i<n_trials; i++) {
+        chmap::ChannelTuple det;
+    }
+    t2 =  std::chrono::high_resolution_clock::now();
 
-    t0 = std::chrono::high_resolution_clock::now();
-    for(int i=0; i<n_trials; i++) {
-        chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(0xFF, 0xFF, 0xFFFF);
-        if(det_item == nullptr) {
-            // do nothing
-        } else {
-            std::cerr << "Error: unexpectedly found DET item for non-existing FE id!" << std::endl;
-        }
-        det_name = det_item->name;
-        det_plane = det_item->plane;
-        det_segment = det_item->segment;
-        det_channel = det_item->channel;
-    }
-    t1 =  std::chrono::high_resolution_clock::now();
-    elapsed = t1 - t0;
-    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of getDETItem (using simple ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "\tAverage time per getDETItem call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
-
-    // std::cout << fe1 << std::endl;
-    t0 = std::chrono::high_resolution_clock::now();
-    for(int i=0; i<n_trials; i++) {
-        auto det = channel_map.get("detector", fe1);
-    }
-    t1 =  std::chrono::high_resolution_clock::now();
-    elapsed = t1 - t0;
-    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of get detector (using general ChannelMap) in " << elapsed.count() << " microseconds." << std::endl;
-    std::cout << "\tAverage time per get detector call: " << (elapsed.count() / n_trials) << " microseconds." << std::endl;
+    elapsed_subtract_overhead_loop = (t1 - t0) - (t2 - t1);
+    std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of get detector (using general ChannelMap) in " << elapsed_subtract_overhead_loop.count() << " microseconds." << std::endl;
+    std::cout << "\tAverage time per get detector call: " << (elapsed_subtract_overhead_loop.count() / n_trials) << " microseconds." << std::endl;
     #endif
     return 0;
 }

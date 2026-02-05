@@ -49,13 +49,7 @@ channel-mapをもとに、インプットとアウトプットの形式の自由
             uint16_t parse_to16(const std::string& token);
             uint8_t parse_to8(const std::string& token);
 */
-namespace chmap {
-    // ChannelMapSimple::ChannelMapSimple() : 
-    //     fItemsFE(),
-    //     fItemsDET()
-    // {
-    // }
-    
+namespace chmap {    
     ChannelMapSimple& ChannelMapSimple::get_instance() {
         static ChannelMapSimple instance;
         return instance;
@@ -76,7 +70,6 @@ namespace chmap {
             std::cout << "  " << pair.first << " -> " << std::hex << pair.second << std::dec << std::endl;
         }
         #endif
-
 
         std::ifstream file(file_path);
         if (!file.is_open()) {
