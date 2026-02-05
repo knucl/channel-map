@@ -143,10 +143,10 @@ int main(int argc, char* argv[]) {
         // detector_plane = std::get<std::string>(det[1]);
         // detector_segment = std::get<std::string>(det[2]);
         // detector_channel = std::get<std::string>(det[3]);
-        detector_id = static_cast<uint64_t>(std::get<chmap::number_t>(det[0]));
-        detector_plane = static_cast<uint64_t>(std::get<chmap::number_t>(det[1]));
-        detector_segment = static_cast<uint64_t>(std::get<chmap::number_t>(det[2]));
-        detector_channel = static_cast<uint64_t>(std::get<chmap::number_t>(det[3]));
+        // detector_id = static_cast<uint64_t>(std::get<chmap::number_t>(det[0]));
+        // detector_plane = static_cast<uint64_t>(std::get<chmap::number_t>(det[1]));
+        // detector_segment = static_cast<uint64_t>(std::get<chmap::number_t>(det[2]));
+        // detector_channel = static_cast<uint64_t>(std::get<chmap::number_t>(det[3]));
     }
     t1 =  std::chrono::high_resolution_clock::now();
     for(int i=0; i<n_trials; i++) {
