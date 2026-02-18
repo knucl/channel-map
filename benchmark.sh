@@ -9,7 +9,7 @@ DUMMY_FILE="./mapdata_dummy.csv"
 DUMMY_MAKER="./dummy_maker.out"
 SKELETON_PROGRAM="./build/simple-skeleton-program"
 
-MULTIPLIERS=(2 4 8 16)
+MULTIPLIERS=(2 4 8 16 32 48 64 80 96 112 128 160 192 224 234 244 253)
 
 for N in "${MULTIPLIERS[@]}"; do
     echo "[benchmark.sh] ${N}-scaled dummy file generating"
