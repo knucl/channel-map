@@ -154,7 +154,7 @@ namespace chmap {
         #endif
         // sort fItems by fe.id
         std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
-            return left.fe.id < right.fe.id;
+            return left.fe.id < right.fe.id; // checkDuplicateFEIDsの狭義弱順序がこの不等号の向きに依存している
         });
         #if DEBUG_PRINT
         std::cout << "finished sorting fItems" << std::endl;
@@ -450,12 +450,12 @@ namespace chmap {
     }// void ChannelMapSimple::printAllItemsDET
 
     void ChannelMapSimple::checkDuplicateFEIDs() {
-        std::cout << "\n[checkDuplicateFEIDs] checking sequence of FE IDs for duplicates..." << std::endl;
+        std::cout << "\n[src/channel_map_simple.cpp/checkDuplicateFEIDs] checking sequence of FE IDs for duplicates..." << std::endl;
         for(const auto& item : fItemsFE) {
             auto range = std::equal_range(fItemsFE.begin(), fItemsFE.end(), item,
                 [](const ChannelMapSimpleItem_FE& left, const ChannelMapSimpleItem_FE& right) {
                     return left.id < right.id;
-                }
+                } // 狭義弱順序の不等号はfItemsFEをソートする順番に合わせる必要がある。
             );
             size_t count = std::distance(range.first, range.second);
             if(count > 1) {
@@ -463,7 +463,7 @@ namespace chmap {
                           << ", count: " << count << std::endl;
             }
         }
-        std::cout << "[checkDuplicateFEIDs] check completed." << std::endl;
+        std::cout << "[src/channel_map_simple.cpp/checkDuplicateFEIDs] check completed." << std::endl;
     }// void ChannelMapSimple::checkDuplicateFEIDs
 
     void ChannelMapSimple::printFEid(ChannelMapSimpleItem_FE fe_item) {
