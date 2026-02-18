@@ -22,6 +22,7 @@
 #define OF_BENCHMARK 1
 #define CHECK_DUPLICATE_FE_ID 1
 #define PRINT_ALL_ITEMS_FE 0
+#define DUMMY 1
 #define ntrials 1000000
 
 /*
@@ -34,6 +35,18 @@ int main(int argc, char* argv[]) {
     channel_map_simple.initialize(input_file_path);
     auto t1 = std::chrono::high_resolution_clock::now();
     std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
+
+    #if DUMMY
+    std::cout << "\n[in simple_skeleton.cpp] Making dummy entries..." << std::endl;
+    std::cout << "\tNumber of original channels: " << channel_map_simple.getNumberOfChannels() << std::endl;
+    t0 = std::chrono::high_resolution_clock::now();
+    channel_map_simple.makeDummyEntry(1000);
+    t1 = std::chrono::high_resolution_clock::now();
+    std::cout << "\n[in simple_skeleton.cpp] Dummy entries made in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
+    std::cout << "\tNumber of channels after making dummy entries: " << channel_map_simple.getNumberOfChannels() << std::endl;
+
+    #endif
+
 
     #if general_chmap
     chmap::ChannelMap& channel_map = chmap::ChannelMap::get_instance();
