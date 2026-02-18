@@ -11,6 +11,10 @@ SKELETON_PROGRAM="./build/simple-skeleton-program"
 
 MULTIPLIERS=(2 4 8 16 32 48 64 80 96 112 128 160 192 224 234 244 253)
 
+echo "[benchmark.sh] Running simple-skeleton-program with original file"
+${SKELETON_PROGRAM} ${ORIGINAL_FILE}
+
+# Loop through the multipliers, generate dummy files, and run the skeleton program
 for N in "${MULTIPLIERS[@]}"; do
     echo "[benchmark.sh] ${N}-scaled dummy file generating"
     ${DUMMY_MAKER} ${ORIGINAL_FILE} ${N}
