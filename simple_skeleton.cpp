@@ -18,8 +18,9 @@
 #include <filesystem>
 #include <fstream>
 
-#define general_chmap 1
+#define general_chmap 0
 #define OF_BENCHMARK 1
+#define ntrials 1000000
 
 /*
 mapdata.csvのファイルパスを与えるとchannel-map-simpleの動作テストをする
@@ -112,7 +113,6 @@ int main(int argc, char* argv[]) {
         chmap::ChannelMapSimpleItem_DET* det_item = channel_map_simple.getDETItem(ip3rd, ip4th, ch);
         if(det_item != nullptr) {
             channel_map_simple.printDETinfo( *det_item );
-            constexpr int ntrials = 1000000;
             auto t0 = std::chrono::high_resolution_clock::now();
             for(int i=0; i<ntrials; i++) {
                 chmap::ChannelMapSimpleItem_DET* det_item_inner = channel_map_simple.getDETItem(ip3rd, ip4th, ch);
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
     }
 
     #if general_chmap
-    constexpr int n_trials = 1000000;
+    constexpr int n_trials = ntrials;
     auto t0 = std::chrono::high_resolution_clock::now();
     auto t1 =  std::chrono::high_resolution_clock::now();
     auto t2 =  std::chrono::high_resolution_clock::now();
