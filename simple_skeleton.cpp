@@ -28,8 +28,10 @@ mapdata.csvのファイルパスを与えるとchannel-map-simpleの動作テス
 int main(int argc, char* argv[]) {
     std::string input_file_path = argv[1];
     chmap::ChannelMapSimple& channel_map_simple = chmap::ChannelMapSimple::get_instance();
+    auto t0 = std::chrono::high_resolution_clock::now();
     channel_map_simple.initialize(input_file_path);
-    std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized." << std::endl;
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
 
     #if general_chmap
     chmap::ChannelMap& channel_map = chmap::ChannelMap::get_instance();
@@ -66,7 +68,7 @@ int main(int argc, char* argv[]) {
     
     // channel_map_simple.printAllItemsFE();
     // channel_map_simple.printAllItemsDET();
-    #if 1
+    #if 0
     std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs..." << std::endl;
     channel_map_simple.checkDuplicateFEIDs();
     #endif
@@ -95,11 +97,11 @@ int main(int argc, char* argv[]) {
     uint32_t det_channel;
 
     std::vector<std::tuple<uint8_t, uint8_t, uint16_t, std::string>> test_items = {
-        {test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right, "T1 right channel"},
-        {test_ip3rd_utof_left, test_ip4th_utof_left, test_ch_utof_left, "utof left channel"},
-        {test_ip3rd_bdc1, test_ip4th_bdc1, test_ch_bdc1, "bdc 1 V plane channel 4"},
-        {test_ip3rd_kldc2, test_ip4th_kldc2, test_ch_kldc2, "kldc 2 U' plane channel 16"},
-        {0xFF, 0xFF, 0xFFFF, "non-existing channel"}
+        {test_ip3rd_T1right, test_ip4th_T1right, test_ch_T1right, "T1_right_channel"},
+        {test_ip3rd_utof_left, test_ip4th_utof_left, test_ch_utof_left, "utof_left_channel"},
+        {test_ip3rd_bdc1, test_ip4th_bdc1, test_ch_bdc1, "bdc_1_V_plane_channel_4"},
+        {test_ip3rd_kldc2, test_ip4th_kldc2, test_ch_kldc2, "kldc_2_U'_plane_channel_16"},
+        {0xFF, 0xFF, 0xFFFF, "non-existing_channel"}
     };
 
     for(const auto& item : test_items) {
@@ -132,11 +134,11 @@ int main(int argc, char* argv[]) {
                       << ", segment: " << static_cast<uint8_t>(det_segment)
                       << ", channel: " << std::hex << std::setw(8) << std::setfill('0') << det_channel << std::dec
                       << std::endl;
-            std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem in " << elapsed_subtract_overhead_loop.count() << " microseconds." << std::endl;
+            std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem in " << elapsed_subtract_overhead_loop.count() << " microseconds." << " Overhead: " << std::chrono::duration<double , std::micro>(t2 - t1).count() << " microseconds." << std::endl;
             std::cout << "\tAverage time per getDETItem call: " << (elapsed_subtract_overhead_loop.count() / ntrials) << " microseconds." << std::endl;
 
             #if OF_BENCHMARK // file out
-            of_benchmark << channel_map_simple.getNumberOfChannels() << " " << ntrials << " " << std::chrono::duration<double , std::micro>(t1 - t0).count() << " " << std::chrono::duration<double , std::micro>(t2 - t1).count() << " " << elapsed_subtract_overhead_loop.count() << std::endl;
+            of_benchmark << channel_map_simple.getNumberOfChannels() << " " << ntrials << " " << std::chrono::duration<double , std::micro>(t1 - t0).count() << " " << std::chrono::duration<double , std::micro>(t2 - t1).count() << " " <<  description <<  std::endl;
             #endif
         } else {
             std::cout << "\tDET item not found for the given FE id." << std::endl;
