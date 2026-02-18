@@ -21,6 +21,7 @@
 #define general_chmap 0
 #define OF_BENCHMARK 1
 #define CHECK_DUPLICATE_FE_ID 1
+#define PRINT_ALL_ITEMS_FE 0
 #define ntrials 1000000
 
 /*
@@ -82,6 +83,14 @@ int main(int argc, char* argv[]) {
     t_check_end = std::chrono::high_resolution_clock::now();
     std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs (summary) completed in " << std::chrono::duration<double, std::micro>(t_check_end - t_check_start).count() << " microseconds." << std::endl;
     std::cout << "[done]" << std::endl;
+    #endif
+
+    #if PRINT_ALL_ITEMS_FE
+    std::ofstream of_all_items_fe("all_items_fe.txt");
+    for(const auto& item : channel_map_simple.fItemsFE) {
+        of_all_items_fe << "FE id: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.id << std::dec << std::endl;
+    }
+    of_all_items_fe.close();
     #endif
 
     // test t1 right channel
