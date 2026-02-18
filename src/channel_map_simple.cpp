@@ -524,4 +524,142 @@ namespace chmap {
                   << static_cast<char>(det_item.channel & 0xFF)
                   << ")" << std::endl;
     }// void ChannelMapSimple::printDETinfo
+
+    void ChannelMapSimple::makeDummyEntry(uint32_t maxFillFactor) {
+        std::vector<ChannelMapSimpleItem_FE> new_fe_items;
+        std::vector<ChannelMapSimpleItem_DET> new_det_items;
+
+        ChannelMapSimpleItem_DET dummy_det;
+            // below ChannelMapSimpleItem_DET examlple
+            // struct ChannelMapSimpleItem_DET {
+            //     uint32_t name;// detector name in 4 char
+            //     uint16_t plane;// plane name in 2 char
+            //     uint8_t segment;// segment number in 8bit int (0-255)
+            //     uint32_t channel;// channel name in 4 char
+            // };
+        dummy_det.name = parse_to32("nil");
+        dummy_det.plane = parse_to16("nil");
+        dummy_det.segment = 0;
+        dummy_det.channel = parse_to32("nil");
+
+        for(auto it = fItems.begin(); it != fItems.end(); ++it){
+            if(it == fItems.begin()){
+                uint32_t gap = it->fe.id - 0;
+                if(gap < maxFillFactor){
+                    if(gap == 0){
+                        new_fe_items.push_back(it->fe);
+                        new_det_items.push_back(it->det);
+                        continue; // no gap, no dummy entry needed
+                    } // endif(gap == 0)
+                    else{
+                        for(int i=0; i<gap; ++i){
+                            if(i == 0){ // for the original entry
+                                new_fe_items.push_back(it->fe);
+                                new_det_items.push_back(it->det);
+                            }
+                            else{
+                                ChannelMapSimpleItem_FE dummy_fe;
+                                dummy_fe.id = it->fe.id + i;
+                                new_fe_items.push_back(dummy_fe);
+                                new_det_items.push_back(dummy_det);
+                            }
+                        } // done(int i=0; i<gap; ++i)
+                    } // endif(gap > 0)
+                } // endif(gap < maxFillFactor)
+                else{
+                    // insert dummy entry
+                    ChannelMapSimpleItem_FE dummy_fe;
+                    for(int i=0; i<maxFillFactor - 1; ++i){
+                        if(i == 0){ // for the original entry
+                            new_fe_items.push_back(it->fe);
+                            new_det_items.push_back(it->det);
+                        }
+                        else{
+                            dummy_fe.id = it->fe.id + gap/maxFillFactor * i;
+                            new_fe_items.push_back(dummy_fe);
+                            new_det_items.push_back(dummy_det);
+                        }
+                    } // done(int i=0; i<maxFillFactor - 1; ++i)
+                } // endif(gap >= maxFillFactor)
+            } // endif(it == fItems.begin())
+            else if(it != fItems.end() - 1){
+                auto original_left = it;
+                auto original_right = it + 1;
+                uint32_t gap = (original_right->fe.id) - (original_left->fe.id);
+                if(gap < maxFillFactor){
+                    if(gap == 0){
+                        new_fe_items.push_back(original_left->fe);
+                        new_det_items.push_back(original_left->det);
+                        continue; // no gap, no dummy entry needed
+                    } // endif(gap == 0)
+                    else{
+                        for(int i=0; i<gap; ++i){
+                            if(i == 0){ // for the original left entry
+                                new_fe_items.push_back(original_left->fe);
+                                new_det_items.push_back(original_left->det);
+                            }
+                            else{
+                                ChannelMapSimpleItem_FE dummy_fe;
+                                dummy_fe.id = original_left->fe.id + i;
+                                new_fe_items.push_back(dummy_fe);
+                                new_det_items.push_back(dummy_det);
+                            }
+                        }
+                    } // endif(gap > 0)
+                } // endif(gap < maxFillFactor)
+                else{
+                    // insert dummy entry
+                    ChannelMapSimpleItem_FE dummy_fe;
+                    uint32_t gapId = original_right->fe.id - original_left->fe.id;
+                    for(int i=0; i<maxFillFactor - 1; ++i){
+                        if(i == 0){ // for the original left entry
+                            new_fe_items.push_back(original_left->fe);
+                            new_det_items.push_back(original_left->det);
+                        }
+                        else{
+                            dummy_fe.id = original_left->fe.id + gapId/maxFillFactor * i;
+                            new_fe_items.push_back(dummy_fe);
+                            new_det_items.push_back(dummy_det);
+                        }
+                    } // done(int i=0; i<maxFillFactor - 1; ++i)
+                } // endif(gap >= maxFillFactor)
+            } // endif(it != fItems.end() - 1)
+            else{
+                uint32_t gap = sizeof(uint32_t) - (it->fe.id + 1);
+                if(gap < maxFillFactor){
+                    for(int i=0; i<gap; ++i){
+                        if(i == 0){ // for the original entry
+                            new_fe_items.push_back(it->fe);
+                            new_det_items.push_back(it->det);
+                        }
+                        else{
+                            ChannelMapSimpleItem_FE dummy_fe;
+                            dummy_fe.id = it->fe.id + 1 + i;
+                            new_fe_items.push_back(dummy_fe);
+                            new_det_items.push_back(dummy_det);
+                        }
+                    } // done(int i=0; i<gap; ++i)
+                } // endif(gap < maxFillFactor)
+                else{
+                    // insert dummy entry
+                    ChannelMapSimpleItem_FE dummy_fe;
+                    uint32_t gapId = sizeof(uint32_t) - (it->fe.id + 1);
+                    for(int i=0; i<maxFillFactor - 1; ++i){
+                        if(i == 0){ // for the original entry
+                            new_fe_items.push_back(it->fe);
+                            new_det_items.push_back(it->det);
+                        }
+                        else{
+                            dummy_fe.id = it->fe.id + 1 + gapId/maxFillFactor * i;
+                            new_fe_items.push_back(dummy_fe);
+                            new_det_items.push_back(dummy_det);
+                        }
+                    } // done(int i=0; i<maxFillFactor - 1; ++i)
+                } // endif(gap >= maxFillFactor)
+            } // endif(it == fItems.begin()), else if(it != fItems.end() - 1), else
+        } // for(auto it = fItems.begin(); it != fItems.end(); ++it)
+
+        fItemsFE = new_fe_items;
+        fItemsDET = new_det_items;
+    }
 }// namespace chmap

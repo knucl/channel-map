@@ -32,6 +32,7 @@ namespace chmap {
             void printFEid(ChannelMapSimpleItem_FE fe_item);
             void printDETinfo(ChannelMapSimpleItem_DET det_item);
             int getNumberOfChannels() const { return fItems.size(); }
+            void makeDummyEntry(uint32_t maxFillFactor = 100); // ソート済みfItems.fe.idの各要素間を最大maxFillFactor個のダミーエントリで等間隔に埋める。
 
             ChannelMapSimple(const ChannelMapSimple&) = delete; // prevent copy constructor
             ChannelMapSimple& operator=(const ChannelMapSimple&) = delete; // prevent copy assignment
