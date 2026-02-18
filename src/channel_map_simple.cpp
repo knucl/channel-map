@@ -530,6 +530,7 @@ namespace chmap {
         std::vector<ChannelMapSimpleItem_DET> new_det_items;
 
         ChannelMapSimpleItem_DET dummy_det;
+        ChannelMapSimpleItem_FE dummy_fe(0, 0, 0);
             // below ChannelMapSimpleItem_DET examlple
             // struct ChannelMapSimpleItem_DET {
             //     uint32_t name;// detector name in 4 char
@@ -558,7 +559,6 @@ namespace chmap {
                                 new_det_items.push_back(it->det);
                             }
                             else{
-                                ChannelMapSimpleItem_FE dummy_fe;
                                 dummy_fe.id = it->fe.id + i;
                                 new_fe_items.push_back(dummy_fe);
                                 new_det_items.push_back(dummy_det);
@@ -568,7 +568,6 @@ namespace chmap {
                 } // endif(gap < maxFillFactor)
                 else{
                     // insert dummy entry
-                    ChannelMapSimpleItem_FE dummy_fe;
                     for(int i=0; i<maxFillFactor - 1; ++i){
                         if(i == 0){ // for the original entry
                             new_fe_items.push_back(it->fe);
@@ -599,7 +598,6 @@ namespace chmap {
                                 new_det_items.push_back(original_left->det);
                             }
                             else{
-                                ChannelMapSimpleItem_FE dummy_fe;
                                 dummy_fe.id = original_left->fe.id + i;
                                 new_fe_items.push_back(dummy_fe);
                                 new_det_items.push_back(dummy_det);
@@ -609,7 +607,6 @@ namespace chmap {
                 } // endif(gap < maxFillFactor)
                 else{
                     // insert dummy entry
-                    ChannelMapSimpleItem_FE dummy_fe;
                     uint32_t gapId = original_right->fe.id - original_left->fe.id;
                     for(int i=0; i<maxFillFactor - 1; ++i){
                         if(i == 0){ // for the original left entry
@@ -633,7 +630,6 @@ namespace chmap {
                             new_det_items.push_back(it->det);
                         }
                         else{
-                            ChannelMapSimpleItem_FE dummy_fe;
                             dummy_fe.id = it->fe.id + 1 + i;
                             new_fe_items.push_back(dummy_fe);
                             new_det_items.push_back(dummy_det);
@@ -642,7 +638,6 @@ namespace chmap {
                 } // endif(gap < maxFillFactor)
                 else{
                     // insert dummy entry
-                    ChannelMapSimpleItem_FE dummy_fe;
                     uint32_t gapId = sizeof(uint32_t) - (it->fe.id + 1);
                     for(int i=0; i<maxFillFactor - 1; ++i){
                         if(i == 0){ // for the original entry
