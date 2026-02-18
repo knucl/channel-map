@@ -42,14 +42,14 @@ int main(int argc, char* argv[]){
         const std::string original_prefix = "0xc0a802";
         // const std::vector<std::string> dummy_prefix = {"0xc0a803","0xc0a804","0xc0a805","0xc0a806","0xc0a807","0xc0a808","0xc0a809"};
         std::vector<std::string> dummy_prefix;
-        int nDummy = 100;
+        int nDummy = std::stoi(argv[2]);
         for(int i=0; i<nDummy; i++){
             std::string dummy_prefix_element;
             std::stringstream ss_dummy;
             ss_dummy << "0xc0a8" << std::setfill('0') << std::setw(2) << std::hex << (3+i);
             ss_dummy >> dummy_prefix_element;
             dummy_prefix.push_back(dummy_prefix_element);
-            #if 1
+            #if 0
             if(is_terminal_out){
                 std::cout << "Generated dummy prefix: " << dummy_prefix_element << std::endl;
             }
