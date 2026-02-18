@@ -318,6 +318,7 @@ namespace chmap {
             {"bottom", "BOTM"},
             {"upstream", "UPST"},
             {"downstream", "DOST"},
+            {"nil", "NIL "}
         };
         // make simplified map
         for(const auto& name_pair : detnames){
@@ -338,7 +339,7 @@ namespace chmap {
             {"Xp", "XP"},
             {"Up", "UP"},
             {"Vp", "VP"},
-            
+            {"nil", "NI"}            
         };
         // make simplified map
         for(const auto& plane_pair : detplanes){
