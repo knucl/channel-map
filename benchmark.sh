@@ -9,7 +9,7 @@ DUMMY_FILE="./mapdata_dummy.csv"
 DUMMY_MAKER="./dummy_maker.out"
 SKELETON_PROGRAM="./build/simple-skeleton-program"
 
-MULTIPLIERS=(2 4 8 16 32 48 64 80 96 112 128 160 192 224 234 244 253)
+MULTIPLIERS=(2 4 8 16 32 48 64 80 88 96 104 112 120 128 144 160 176 192 208 224 229 234 239 244 249 253)
 
 echo "[benchmark.sh] Running simple-skeleton-program with original file"
 ${SKELETON_PROGRAM} ${ORIGINAL_FILE}
