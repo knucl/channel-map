@@ -28,6 +28,7 @@ namespace chmap {
             void printAllItemsFE();
             void printAllItemsDET();
             void checkDuplicateFEIDs();
+            void checkDuplicateFEIDs_summary();
             void printFEid(ChannelMapSimpleItem_FE fe_item);
             void printDETinfo(ChannelMapSimpleItem_DET det_item);
             int getNumberOfChannels() const { return fItems.size(); }
