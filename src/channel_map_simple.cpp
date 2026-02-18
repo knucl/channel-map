@@ -462,19 +462,40 @@ namespace chmap {
                 std::cout << "\tduplicate FEID found(count: " << count << "): ";
                 printFEid(item);
                 for(auto it = range.first; it != range.second; ++it){
-                    ChannelMapSimpleItem_DET* det_item = getDETItem((it->id >> 24) & 0xFF, (it->id >> 16) & 0xFF, it->id & 0xFFFF);
-                    if(det_item != nullptr) {
-                        std::cout << "\t\tcorrenponding DET info: ";
-                        printDETinfo(*det_item);
-                    }
-                    else{
-                        std::cout << "\t\tcorresponding DET info not found." << std::endl;
-                    }
+                    ChannelMapSimpleItem_DET det_item = fItemsDET[std::distance(fItemsFE.begin(), it)];
+                    std::cout << "\t\tcorresponding DET info: ";
+                    printDETinfo(det_item);
                 }
             }
         }
         std::cout << "[src/channel_map_simple.cpp/checkDuplicateFEIDs] check completed." << std::endl;
     }// void ChannelMapSimple::checkDuplicateFEIDs
+    
+    void ChannelMapSimple::checkDuplicateFEIDs_summary(){
+        auto fItemsFE_copy = fItemsFE;
+        int duplicate_numGroups = 0;
+        int duplicate_totalCount = 0;
+        for(const auto& item : fItemsFE_copy){
+            auto range = std::equal_range(fItemsFE_copy.begin(), fItemsFE_copy.end(), item, [](const ChannelMapSimpleItem_FE& left, const ChannelMapSimpleItem_FE& right){
+                return left.id < right.id;
+            });
+            size_t count = std::distance(range.first, range.second);
+            if(count > 1){
+                duplicate_numGroups++;
+                for(size_t i=0; i<count-1; ++i){// もとのものを残し、重複しているものを削除する
+                    auto it = range.first + 1;
+                    if(it != range.second){
+                        fItemsFE_copy.erase(it);
+                        duplicate_totalCount++;
+                    }
+                    else{
+                        std::cout << "自分の考えが正しければ、このメッセージは出力されてはならない。" << std::endl;
+                    }
+                }
+            }
+        }
+        std::cout << "[src/channel_map_simple.cpp/checkDuplicateFEIDs_summary] summary: " << duplicate_numGroups << " groups of duplicates found, total count of duplicates: " << duplicate_totalCount << "(means extra items found)"<< std::endl;
+    }// void ChannelMapSimple::checkDuplicateFEIDs_summary
 
     void ChannelMapSimple::printFEid(ChannelMapSimpleItem_FE fe_item) {
         std::cout << "\tFE id: 0x" << std::hex << std::setw(8) << std::setfill('0') << fe_item.id << std::dec << std::endl;
