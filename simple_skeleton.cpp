@@ -71,7 +71,17 @@ int main(int argc, char* argv[]) {
     // channel_map_simple.printAllItemsDET();
     #if CHECK_DUPLICATE_FE_ID
     std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs..." << std::endl;
+    auto t_check_start = std::chrono::high_resolution_clock::now();
     channel_map_simple.checkDuplicateFEIDs();
+    auto t_check_end = std::chrono::high_resolution_clock::now();
+    std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs completed in " << std::chrono::duration<double, std::micro>(t_check_end - t_check_start).count() << " microseconds." << std::endl;
+    std::cout << "[done]" << std::endl;
+    std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs (summary)..." << std::endl;
+    t_check_start = std::chrono::high_resolution_clock::now();
+    channel_map_simple.checkDuplicateFEIDs_summary();
+    t_check_end = std::chrono::high_resolution_clock::now();
+    std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs (summary) completed in " << std::chrono::duration<double, std::micro>(t_check_end - t_check_start).count() << " microseconds." << std::endl;
+    std::cout << "[done]" << std::endl;
     #endif
 
     // test t1 right channel
