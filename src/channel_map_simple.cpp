@@ -731,6 +731,9 @@ namespace chmap {
             std::cerr << "failed to open file for output: " << filename << std::endl;
             return 0;
         }
+        int progressInterval = fItems.size() / 10; // 10%ごとに進捗を表示
+        uint32_t processedLines = 0;
+        #if 0 // raw format output
         for(const auto& item : fItems) {
             outfile << "0x" << std::hex << std::setw(8) << std::setfill('0') << item.fe.id << std::dec
                     << " " << std::hex << std::setw(8) << std::setfill('0') << item.det.name << std::dec
@@ -738,7 +741,48 @@ namespace chmap {
                     << " " << static_cast<uint32_t>(item.det.segment)
                     << " " << std::hex << std::setw(8) << std::setfill('0') << item.det.channel << std::dec
                     << "\n";
+            if(processedLines % progressInterval == 0) {
+                std::cout << "Progress: " << (processedLines * 100) / fItems.size() << "% (" << processedLines << "/" << fItems.size() << " items processed)" << std::endl;
+            }
+            processedLines++;
         }
+        #endif
+        #if 1 // char format output
+        for(const auto& item : fItems) {
+            outfile << "FE id: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.fe.id << std::dec;
+            outfile << "  DET name: " << std::dec
+                    << " (char: " << static_cast<char>((item.det.name >> 24) & 0xFF)
+                    << static_cast<char>((item.det.name >> 16) & 0xFF)
+                    << static_cast<char>((item.det.name >> 8) & 0xFF)
+                    << static_cast<char>(item.det.name & 0xFF)
+                    << "),";
+            outfile << "  plane: " << std::dec
+                    << " (char: " << static_cast<char>((item.det.plane >> 8) & 0xFF)
+                    << static_cast<char>(item.det.plane & 0xFF)
+                    << "),";
+            outfile << "  segment: " << static_cast<uint32_t>(item.det.segment) << ",";
+            outfile << "  channel: " << std::dec
+                    << " (char: " << static_cast<char>((item.det.channel >> 24) & 0xFF)
+                    << static_cast<char>((item.det.channel >> 16) & 0xFF)
+                    << static_cast<char>((item.det.channel >> 8) & 0xFF)
+                    << static_cast<char>(item.det.channel & 0xFF)
+                    << ")" << std::endl;
+            if(processedLines % progressInterval == 0) {
+                std::cout << "Progress: " << (processedLines * 100) / fItems.size() << "% (" << processedLines << "/" << fItems.size() << " items processed)" << std::endl;
+            }
+            processedLines++;
+        }
+        #endif
+        #if 0
+        // fe only
+        for(const auto& item : fItems) {
+            outfile << "0x" << std::hex << std::setw(8) << std::setfill('0') << item.fe.id << std::dec << "\n";
+            if(processedLines % progressInterval == 0) {
+                std::cout << "Progress: " << (processedLines * 100) / fItems.size() << "% (" << processedLines << "/" << fItems.size() << " items processed)" << std::endl;
+            }
+            processedLines++;
+        }
+        #endif
         outfile.close();
         return fItems.size();
     }// uint32_t ChannelMapSimple::fileoutAllItems
