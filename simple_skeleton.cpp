@@ -15,7 +15,11 @@
 
 #include <chrono>
 
+#include <filesystem>
+#include <fstream>
+
 #define general_chmap 1
+#define of_benchmark 1
 
 /*
 mapdata.csvのファイルパスを与えるとchannel-map-simpleの動作テストをする
@@ -24,6 +28,7 @@ int main(int argc, char* argv[]) {
     std::string input_file_path = argv[1];
     chmap::ChannelMapSimple& channel_map_simple = chmap::ChannelMapSimple::get_instance();
     channel_map_simple.initialize(input_file_path);
+    std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized." << std::endl;
 
     #if general_chmap
     chmap::ChannelMap& channel_map = chmap::ChannelMap::get_instance();
@@ -52,10 +57,18 @@ int main(int argc, char* argv[]) {
     uint8_t fe3_ip3rd = static_cast<uint8_t>((fe3_id >> 8) & 0xFF);
     #endif
 
-    std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized." << std::endl;
+    #if of_benchmark // file out, number of channels, time for search
+    std::ofstream of_benchmark("benchmark_results.txt", std::ios::app);
+    std::cout << "\n[in simple_skeleton.cpp] Benchmark of " << channel_map_simple.getNumberOfChannels() << " channels started." << std::endl;
+    #endif
+
+    
     // channel_map_simple.printAllItemsFE();
     // channel_map_simple.printAllItemsDET();
+    #if 1
+    std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs..." << std::endl;
     channel_map_simple.checkDuplicateFEIDs();
+    #endif
 
     // test t1 right channel
     uint8_t test_ip3rd_T1right = 0x02;
@@ -122,6 +135,9 @@ int main(int argc, char* argv[]) {
             std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem in " << elapsed_subtract_overhead_loop.count() << " microseconds." << std::endl;
             std::cout << "\tAverage time per getDETItem call: " << (elapsed_subtract_overhead_loop.count() / ntrials) << " microseconds." << std::endl;
 
+            #if of_benchmark // file out
+            of_benchmark << channel_map_simple.getNumberOfChannels() << "," << ntrials << "," << std::chrono::duration<double , std::micro>(t1 - t0).count() << "," << std::chrono::duration<double , std::micro>(t2 - t1).count() << "," << elapsed_subtract_overhead_loop.count() << std::endl;
+            #endif
         } else {
             std::cout << "\tDET item not found for the given FE id." << std::endl;
         }
