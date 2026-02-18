@@ -19,7 +19,7 @@
 #include <fstream>
 
 #define general_chmap 1
-#define of_benchmark 1
+#define OF_BENCHMARK 1
 
 /*
 mapdata.csvのファイルパスを与えるとchannel-map-simpleの動作テストをする
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     uint8_t fe3_ip3rd = static_cast<uint8_t>((fe3_id >> 8) & 0xFF);
     #endif
 
-    #if of_benchmark // file out, number of channels, time for search
+    #if OF_BENCHMARK // file out, number of channels, time for search
     std::ofstream of_benchmark("benchmark_results.txt", std::ios::app);
     std::cout << "\n[in simple_skeleton.cpp] Benchmark of " << channel_map_simple.getNumberOfChannels() << " channels started." << std::endl;
     #endif
@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
             std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem in " << elapsed_subtract_overhead_loop.count() << " microseconds." << std::endl;
             std::cout << "\tAverage time per getDETItem call: " << (elapsed_subtract_overhead_loop.count() / ntrials) << " microseconds." << std::endl;
 
-            #if of_benchmark // file out
+            #if OF_BENCHMARK // file out
             of_benchmark << channel_map_simple.getNumberOfChannels() << "," << ntrials << "," << std::chrono::duration<double , std::micro>(t1 - t0).count() << "," << std::chrono::duration<double , std::micro>(t2 - t1).count() << "," << elapsed_subtract_overhead_loop.count() << std::endl;
             #endif
         } else {
