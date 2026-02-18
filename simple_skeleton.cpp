@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
             std::cout << "\tAverage time per getDETItem call: " << (elapsed_subtract_overhead_loop.count() / ntrials) << " microseconds." << std::endl;
 
             #if OF_BENCHMARK // file out
-            of_benchmark << channel_map_simple.getNumberOfChannels() << "," << ntrials << "," << std::chrono::duration<double , std::micro>(t1 - t0).count() << "," << std::chrono::duration<double , std::micro>(t2 - t1).count() << "," << elapsed_subtract_overhead_loop.count() << std::endl;
+            of_benchmark << channel_map_simple.getNumberOfChannels() << " " << ntrials << " " << std::chrono::duration<double , std::micro>(t1 - t0).count() << " " << std::chrono::duration<double , std::micro>(t2 - t1).count() << " " << elapsed_subtract_overhead_loop.count() << std::endl;
             #endif
         } else {
             std::cout << "\tDET item not found for the given FE id." << std::endl;
