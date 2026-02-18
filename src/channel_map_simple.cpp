@@ -723,6 +723,23 @@ namespace chmap {
         std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
             return left.fe.id < right.fe.id; // checkDuplicateFEIDsの狭義弱順序がこの不等号の向きに依存している
         });
+    }// void ChannelMapSimple::makeDummyEntry
 
-    }
+    uint32_t ChannelMapSimple::fileoutAllItems(const std::string& filename) {
+        std::ofstream outfile(filename);
+        if(!outfile.is_open()) {
+            std::cerr << "failed to open file for output: " << filename << std::endl;
+            return 0;
+        }
+        for(const auto& item : fItems) {
+            outfile << "0x" << std::hex << std::setw(8) << std::setfill('0') << item.fe.id << std::dec
+                    << " " << std::hex << std::setw(8) << std::setfill('0') << item.det.name << std::dec
+                    << " " << std::hex << std::setw(4) << std::setfill('0') << item.det.plane << std::dec
+                    << " " << static_cast<uint32_t>(item.det.segment)
+                    << " " << std::hex << std::setw(8) << std::setfill('0') << item.det.channel << std::dec
+                    << "\n";
+        }
+        outfile.close();
+        return fItems.size();
+    }// uint32_t ChannelMapSimple::fileoutAllItems
 }// namespace chmap
