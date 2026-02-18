@@ -30,6 +30,7 @@ namespace chmap {
             void checkDuplicateFEIDs();
             void printFEid(ChannelMapSimpleItem_FE fe_item);
             void printDETinfo(ChannelMapSimpleItem_DET det_item);
+            int getNumberOfChannels() const { return fItems.size(); }
 
             ChannelMapSimple(const ChannelMapSimple&) = delete; // prevent copy constructor
             ChannelMapSimple& operator=(const ChannelMapSimple&) = delete; // prevent copy assignment
