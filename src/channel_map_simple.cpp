@@ -459,8 +459,18 @@ namespace chmap {
             );
             size_t count = std::distance(range.first, range.second);
             if(count > 1) {
-                std::cerr << "\tduplicate FE id found: 0x" << std::hex << std::setw(8) << std::setfill('0') << item.id << std::dec
-                          << ", count: " << count << std::endl;
+                std::cout << "\tduplicate FEID found(count: " << count << "): ";
+                printFEid(item);
+                for(auto it = range.first; it != range.second; ++it){
+                    ChannelMapSimpleItem_DET* det_item = getDETItem((it->id >> 24) & 0xFF, (it->id >> 16) & 0xFF, it->id & 0xFFFF);
+                    if(det_item != nullptr) {
+                        std::cout << "\t\tcorrenponding DET info: ";
+                        printDETinfo(*det_item);
+                    }
+                    else{
+                        std::cout << "\t\tcorresponding DET info not found." << std::endl;
+                    }
+                }
             }
         }
         std::cout << "[src/channel_map_simple.cpp/checkDuplicateFEIDs] check completed." << std::endl;
