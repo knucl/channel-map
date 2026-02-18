@@ -13,6 +13,7 @@
 #include <variant>
 
 #define DEBUG_PRINT 0
+#define DEBUG_PRINT_DUMMY_MAKER 0
 
 
 /*
@@ -550,6 +551,10 @@ namespace chmap {
                     if(gap == 0){
                         new_fe_items.push_back(it->fe);
                         new_det_items.push_back(it->det);
+                        #if DEBUG_PRINT_DUMMY_MAKER
+                        printFEid(it->fe);
+                        printDETinfo(it->det);
+                        #endif
                         continue; // no gap, no dummy entry needed
                     } // endif(gap == 0)
                     else{
@@ -557,11 +562,19 @@ namespace chmap {
                             if(i == 0){ // for the original entry
                                 new_fe_items.push_back(it->fe);
                                 new_det_items.push_back(it->det);
+                                #if DEBUG_PRINT_DUMMY_MAKER
+                                printFEid(it->fe);
+                                printDETinfo(it->det);
+                                #endif
                             }
                             else{
-                                dummy_fe.id = it->fe.id + i;
+                                dummy_fe.id = 0 + i;
                                 new_fe_items.push_back(dummy_fe);
                                 new_det_items.push_back(dummy_det);
+                                #if DEBUG_PRINT_DUMMY_MAKER
+                                printFEid(dummy_fe);
+                                printDETinfo(dummy_det);
+                                #endif
                             }
                         } // done(int i=0; i<gap; ++i)
                     } // endif(gap > 0)
@@ -572,11 +585,19 @@ namespace chmap {
                         if(i == 0){ // for the original entry
                             new_fe_items.push_back(it->fe);
                             new_det_items.push_back(it->det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(it->fe);
+                            printDETinfo(it->det);
+                            #endif
                         }
                         else{
-                            dummy_fe.id = it->fe.id + gap/maxFillFactor * i;
+                            dummy_fe.id = 0 + gap/maxFillFactor * i;
                             new_fe_items.push_back(dummy_fe);
                             new_det_items.push_back(dummy_det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(dummy_fe);
+                            printDETinfo(dummy_det);
+                            #endif
                         }
                     } // done(int i=0; i<maxFillFactor - 1; ++i)
                 } // endif(gap >= maxFillFactor)
@@ -589,6 +610,10 @@ namespace chmap {
                     if(gap == 0){
                         new_fe_items.push_back(original_left->fe);
                         new_det_items.push_back(original_left->det);
+                        #if DEBUG_PRINT_DUMMY_MAKER
+                        printFEid(original_left->fe);
+                        printDETinfo(original_left->det);
+                        #endif
                         continue; // no gap, no dummy entry needed
                     } // endif(gap == 0)
                     else{
@@ -596,11 +621,19 @@ namespace chmap {
                             if(i == 0){ // for the original left entry
                                 new_fe_items.push_back(original_left->fe);
                                 new_det_items.push_back(original_left->det);
+                                #if DEBUG_PRINT_DUMMY_MAKER
+                                printFEid(original_left->fe);
+                                printDETinfo(original_left->det);
+                                #endif
                             }
                             else{
                                 dummy_fe.id = original_left->fe.id + i;
                                 new_fe_items.push_back(dummy_fe);
                                 new_det_items.push_back(dummy_det);
+                                #if DEBUG_PRINT_DUMMY_MAKER
+                                printFEid(dummy_fe);
+                                printDETinfo(dummy_det);
+                                #endif
                             }
                         }
                     } // endif(gap > 0)
@@ -612,11 +645,19 @@ namespace chmap {
                         if(i == 0){ // for the original left entry
                             new_fe_items.push_back(original_left->fe);
                             new_det_items.push_back(original_left->det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(original_left->fe);
+                            printDETinfo(original_left->det);
+                            #endif
                         }
                         else{
                             dummy_fe.id = original_left->fe.id + gapId/maxFillFactor * i;
                             new_fe_items.push_back(dummy_fe);
                             new_det_items.push_back(dummy_det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(dummy_fe);
+                            printDETinfo(dummy_det);
+                            #endif
                         }
                     } // done(int i=0; i<maxFillFactor - 1; ++i)
                 } // endif(gap >= maxFillFactor)
@@ -628,11 +669,19 @@ namespace chmap {
                         if(i == 0){ // for the original entry
                             new_fe_items.push_back(it->fe);
                             new_det_items.push_back(it->det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(it->fe);
+                            printDETinfo(it->det);
+                            #endif
                         }
                         else{
                             dummy_fe.id = it->fe.id + 1 + i;
                             new_fe_items.push_back(dummy_fe);
                             new_det_items.push_back(dummy_det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(dummy_fe);
+                            printDETinfo(dummy_det);
+                            #endif
                         }
                     } // done(int i=0; i<gap; ++i)
                 } // endif(gap < maxFillFactor)
@@ -643,18 +692,37 @@ namespace chmap {
                         if(i == 0){ // for the original entry
                             new_fe_items.push_back(it->fe);
                             new_det_items.push_back(it->det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(it->fe);
+                            printDETinfo(it->det);
+                            #endif
                         }
                         else{
                             dummy_fe.id = it->fe.id + 1 + gapId/maxFillFactor * i;
                             new_fe_items.push_back(dummy_fe);
                             new_det_items.push_back(dummy_det);
+                            #if DEBUG_PRINT_DUMMY_MAKER
+                            printFEid(dummy_fe);
+                            printDETinfo(dummy_det);
+                            #endif
                         }
                     } // done(int i=0; i<maxFillFactor - 1; ++i)
                 } // endif(gap >= maxFillFactor)
             } // endif(it == fItems.begin()), else if(it != fItems.end() - 1), else
         } // for(auto it = fItems.begin(); it != fItems.end(); ++it)
 
-        fItemsFE = new_fe_items;
-        fItemsDET = new_det_items;
+        std::vector<ChannelMapSimpleItem> new_fItems;
+        auto fe_it = new_fe_items.begin();
+        auto det_it = new_det_items.begin();
+        for(; fe_it != new_fe_items.end() && det_it != new_det_items.end(); ++fe_it, ++det_it){
+            ChannelMapSimpleItem item = { *fe_it, *det_it };
+            new_fItems.push_back(item);
+        }
+        fItems = new_fItems;
+        // sort
+        std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
+            return left.fe.id < right.fe.id; // checkDuplicateFEIDsの狭義弱順序がこの不等号の向きに依存している
+        });
+
     }
 }// namespace chmap
