@@ -20,6 +20,7 @@
 
 #define general_chmap 0
 #define OF_BENCHMARK 1
+#define CHECK_DUPLICATE_FE_ID 1
 #define ntrials 1000000
 
 /*
@@ -68,7 +69,7 @@ int main(int argc, char* argv[]) {
     
     // channel_map_simple.printAllItemsFE();
     // channel_map_simple.printAllItemsDET();
-    #if 0
+    #if CHECK_DUPLICATE_FE_ID
     std::cout << "\n[in simple_skeleton.cpp] Checking for duplicate FE IDs..." << std::endl;
     channel_map_simple.checkDuplicateFEIDs();
     #endif
