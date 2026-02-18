@@ -472,6 +472,7 @@ namespace chmap {
     }// void ChannelMapSimple::checkDuplicateFEIDs
     
     void ChannelMapSimple::checkDuplicateFEIDs_summary(){
+        std::cout << "\n[src/channel_map_simple.cpp/checkDuplicateFEIDs_summary] checking sequence of FE IDs for duplicates..." << std::endl;
         auto fItemsFE_copy = fItemsFE;
         int duplicate_numGroups = 0;
         int duplicate_totalCount = 0;
