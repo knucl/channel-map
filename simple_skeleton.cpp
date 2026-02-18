@@ -44,7 +44,15 @@ int main(int argc, char* argv[]) {
     t1 = std::chrono::high_resolution_clock::now();
     std::cout << "\n[in simple_skeleton.cpp] Dummy entries made in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
     std::cout << "\tNumber of channels after making dummy entries: " << channel_map_simple.getNumberOfChannels() << std::endl;
+    #endif
 
+    #if 0
+    std::string output_file_path = "all_items_after_dummy.txt";
+    t0 = std::chrono::high_resolution_clock::now();
+    uint32_t nChannelsOutput = channel_map_simple.fileoutAllItems(output_file_path);
+    t1 = std::chrono::high_resolution_clock::now();
+    std::cout << "\n[in simple_skeleton.cpp] All items output to " << output_file_path << " in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
+    std::cout << "\tNumber of channels output: " << nChannelsOutput << std::endl;
     #endif
 
 
