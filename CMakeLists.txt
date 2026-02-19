@@ -27,8 +27,6 @@ endif()
 
 set(CMAKE_BUILD_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 
-
-
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.hpp")
 
@@ -39,7 +37,6 @@ target_include_directories(channel-map PUBLIC
     $<INSTALL_INTERFACE:include>
 ) ### ビルド時はソースディレクトリ、インストール後はインストール先のincludeを参照
 
-### filesystem
 ### filesystem
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(channel-map PUBLIC stdc++fs)
@@ -90,6 +87,11 @@ target_link_libraries(speedtest PRIVATE channel-map ${FILESYSTEM_LIB})
 add_executable(simple-skeleton-program simple_skeleton.cpp)
 target_compile_features(simple-skeleton-program PRIVATE cxx_std_17)
 target_link_libraries(simple-skeleton-program PRIVATE channel-map ${FILESYSTEM_LIB})
+
+### CERN ROOT
+find_package(ROOT REQUIRED)
+target_link_libraries(simple-skeleton-program ${ROOT_LIBRARIES})
+target_link_directories(simple-skeleton-program PRIVATE ${ROOT_INCLUDE_DIRS})
 
 ### install
 install(DIRECTORY include/ DESTINATION include)
