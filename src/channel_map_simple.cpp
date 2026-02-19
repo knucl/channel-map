@@ -822,6 +822,8 @@ namespace chmap {
             ChannelMapSimpleItem item = { *fe_it, *det_it };
             new_fItems.push_back(item);
         }
+        new_fe_items.clear();
+        new_det_items.clear();
         fItems = new_fItems;
         new_fItems.clear();
         // sort
