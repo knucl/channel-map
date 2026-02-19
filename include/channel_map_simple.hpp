@@ -33,6 +33,7 @@ namespace chmap {
             void printDETinfo(ChannelMapSimpleItem_DET det_item);
             int getNumberOfChannels() const { return fItems.size(); }
             void makeDummyEntry(uint32_t maxFillFactor = 100); // ソート済みfItems.fe.idの各要素間を最大maxFillFactor個のダミーエントリで等間隔に埋める。
+            void makeDummyEntry2(double FillRatio = 0.2); // ソート済みfItems.fe.idの各要素間をFillRatioの割合のダミーエントリで等間隔に埋める。
             uint32_t fileoutAllItems(const std::string& output_dir);
 
             ChannelMapSimple(const ChannelMapSimple&) = delete; // prevent copy constructor
