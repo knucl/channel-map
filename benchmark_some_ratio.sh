@@ -8,3 +8,5 @@ for r in "${RATIO[@]}"; do
     $EXCUTABLE $INPUT_FILE $r
 done
 echo "Finished all runs."
+
+rm ./core.*

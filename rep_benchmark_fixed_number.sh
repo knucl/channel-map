@@ -15,3 +15,5 @@ for i in $(seq 1 $numreps); do
     echo "Run $i"
     $command
 done
+
+rm ./core.*

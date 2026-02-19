@@ -22,3 +22,5 @@ for N in "${MULTIPLIERS[@]}"; do
     echo "[benchmark.sh] Running simple-skeleton-program with ${N}-scaled dummy file"
     ${SKELETON_PROGRAM} ${DUMMY_FILE}
 done
+
+rm ./core.*
