@@ -736,6 +736,8 @@ namespace chmap {
     }// void ChannelMapSimple::makeDummyEntry
 
     void ChannelMapSimple::makeDummyEntry2(double FillRatio) {
+        uint32_t originalNumItems = fItems.size();
+        uint32_t countDummyEntries = 0;
         std::vector<ChannelMapSimpleItem_FE> new_fe_items;
         std::vector<ChannelMapSimpleItem_DET> new_det_items;
 
@@ -776,6 +778,12 @@ namespace chmap {
 
             new_fe_items.push_back(it->fe);
             new_det_items.push_back(it->det);
+            #if 0
+            std::cout << "original entry added" << std::endl;
+            std::cout << "\tproceeding gap: " << gapId << " between FE id " << std::hex << leftId << std::dec << " and FE id " << std::hex << rightId << std::dec << std::endl;
+            std::cout << "\t" << (gapId-1)*FillRatio << " dummy entries will be added in this gap if maxFillFactor is not exceeded." << std::endl;
+            #endif
+            countDummyEntries++;
 
             if(gapId <= 1){
                 continue; // no gap, no dummy entry needed
@@ -783,14 +791,18 @@ namespace chmap {
             else{
                 // insert dummy entry
                 maxFillFactor = (gapId - 1) * FillRatio;
+                if(maxFillFactor < 1){
+                    continue; // no dummy entry needed
+                }
                 for(int i=0; i < maxFillFactor - 1; ++i){
                     if(i == 0){ // for the original entry
                         continue; // already added above
                     }
                     else{
-                        dummy_fe.id = 0 + gapId/maxFillFactor * i;
+                        dummy_fe.id = leftId + gapId/maxFillFactor * i;
                         new_fe_items.push_back(dummy_fe);
                         new_det_items.push_back(dummy_det);
+                        countDummyEntries++;
                         #if DEBUG_PRINT_DUMMY_MAKER
                         printFEid(dummy_fe);
                         printDETinfo(dummy_det);
@@ -798,6 +810,9 @@ namespace chmap {
                     }
                 } // done(int i=0; i<maxFillFactor - 1; ++i)
             } // endif(gap > 1)
+            if(countDummyEntries % 10000 == 0) {
+                std::cout << "\tProgress: " << (countDummyEntries * 100) / (originalNumItems + countDummyEntries) << "% (" << countDummyEntries << " dummy entries added)" << std::endl;
+            }
         } // for(auto it = fItems.begin(); it != fItems.end(); ++it)
 
         std::vector<ChannelMapSimpleItem> new_fItems;
