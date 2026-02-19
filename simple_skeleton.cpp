@@ -18,9 +18,12 @@
 #include <filesystem>
 #include <fstream>
 
+#include <TFile.h>
+#include <TTree.h>
+
 #define general_chmap 0
 #define OF_BENCHMARK 1
-#define CHECK_DUPLICATE_FE_ID 1
+#define CHECK_DUPLICATE_FE_ID 0
 #define PRINT_ALL_ITEMS_FE 0
 #define DUMMY 1
 #define ntrials 1000000
@@ -37,10 +40,23 @@ int main(int argc, char* argv[]) {
     std::cout << "\n[in simple_skeleton.cpp] ChannelMapSimple initialized in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
 
     #if DUMMY
+    int dummyfillfactor = 1000000;
+    double dummyfillratio = 0.2;  
     std::cout << "\n[in simple_skeleton.cpp] Making dummy entries..." << std::endl;
     std::cout << "\tNumber of original channels: " << channel_map_simple.getNumberOfChannels() << std::endl;
     t0 = std::chrono::high_resolution_clock::now();
-    channel_map_simple.makeDummyEntry(1000000);
+    if(argc > 2){
+        if(std::stod(argv[2]) < 1){
+            dummyfillratio = std::stod(argv[2]);
+            std::cout << "\tmakeDummyEntry2 called with FillRatio = " << dummyfillratio << std::endl;
+            channel_map_simple.makeDummyEntry2(dummyfillratio);
+        }
+        else if(std::stoi(argv[2]) >= 1){
+            dummyfillfactor = std::stoi(argv[2]);
+            std::cout << "\tmakeDummyEntry called with maxFillFactor = " << dummyfillfactor << std::endl;
+            channel_map_simple.makeDummyEntry(dummyfillfactor);
+        }
+    }
     t1 = std::chrono::high_resolution_clock::now();
     std::cout << "\n[in simple_skeleton.cpp] Dummy entries made in " << std::chrono::duration<double, std::micro>(t1 - t0).count() << " microseconds." << std::endl;
     std::cout << "\tNumber of channels after making dummy entries: " << channel_map_simple.getNumberOfChannels() << std::endl;
@@ -175,7 +191,7 @@ int main(int argc, char* argv[]) {
                       << ", segment: " << static_cast<uint8_t>(det_segment)
                       << ", channel: " << std::hex << std::setw(8) << std::setfill('0') << det_channel << std::dec
                       << std::endl;
-            std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem in " << elapsed_subtract_overhead_loop.count() << " microseconds." << " Overhead: " << std::chrono::duration<double , std::micro>(t2 - t1).count() << " microseconds." << std::endl;
+            std::cout << "\n[in simple_skeleton.cpp] Performed " << ntrials << " trials of getDETItem from " << channel_map_simple.getNumberOfChannels() << " channels in " << elapsed_subtract_overhead_loop.count() << " microseconds." << " Overhead: " << std::chrono::duration<double , std::micro>(t2 - t1).count() << " microseconds." << std::endl;
             std::cout << "\tAverage time per getDETItem call: " << (elapsed_subtract_overhead_loop.count() / ntrials) << " microseconds." << std::endl;
 
             #if OF_BENCHMARK // file out
@@ -216,6 +232,26 @@ int main(int argc, char* argv[]) {
     elapsed_subtract_overhead_loop = (t1 - t0) - (t2 - t1);
     std::cout << "\n[in simple_skeleton.cpp] Performed " << n_trials << " trials of get detector (using general ChannelMap) in " << elapsed_subtract_overhead_loop.count() << " microseconds." << std::endl;
     std::cout << "\tAverage time per get detector call: " << (elapsed_subtract_overhead_loop.count() / n_trials) << " microseconds." << std::endl;
+    #endif
+
+    #if 0
+    std::cout << "\n[in simple_skeleton.cpp] generating root file including all channel fe id" << std::endl;
+    TFile* output_root_file = new TFile("all_items_after_dummy.root", "RECREATE");
+    TTree* tree = new TTree("channel_map_simple_tree", "Tree containing all channel map simple items after dummy entry addition");
+    uint32_t feid;
+    tree->Branch("feid", &feid, "feid/i");
+    uint32_t nentry = channel_map_simple.getNumberOfChannels();
+    uint32_t entry_count = 0;
+    for(const auto& item : channel_map_simple.fItemsFE) {
+        feid = item.id;
+        tree->Fill();
+        entry_count++;
+        if(entry_count % 10000 == 0) {
+            std::cout << "\tProgress: " << (entry_count * 100) / nentry << "% (" << entry_count << " entries filled)" << std::endl;
+        }
+    }
+    tree->Write();
+    output_root_file->Close();
     #endif
     return 0;
 }
