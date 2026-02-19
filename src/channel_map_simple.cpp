@@ -14,6 +14,7 @@
 
 #define DEBUG_PRINT 0
 #define DEBUG_PRINT_DUMMY_MAKER 0
+#define DEBUG_PRINT_GETFERANK 0
 
 
 /*
@@ -410,6 +411,9 @@ namespace chmap {
     size_t ChannelMapSimple::getFERank(uint8_t ip3rd, uint8_t ip4th, uint16_t ch) {
         uint32_t id = (uint32_t(ip3rd) << 24) | (uint32_t(ip4th) << 16) | uint32_t(ch);
         // binary search in fItemsFE, 
+        #if DEBUG_PRINT_GETFERANK
+        std::cout << "getFERank from " << fItemsFE.size() << " items" << std::endl;
+        #endif
         auto it = std::lower_bound(fItemsFE.begin(), fItemsFE.end(), id,
             [](const ChannelMapSimpleItem_FE& item, uint32_t value) {
                 return item.id < value;
@@ -723,7 +727,98 @@ namespace chmap {
         std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
             return left.fe.id < right.fe.id; // checkDuplicateFEIDsの狭義弱順序がこの不等号の向きに依存している
         });
+        fItemsFE.clear();
+        fItemsDET.clear();
+        for(const auto& item : fItems){
+            fItemsFE.push_back(item.fe);
+            fItemsDET.push_back(item.det);
+        }
     }// void ChannelMapSimple::makeDummyEntry
+
+    void ChannelMapSimple::makeDummyEntry2(double FillRatio) {
+        std::vector<ChannelMapSimpleItem_FE> new_fe_items;
+        std::vector<ChannelMapSimpleItem_DET> new_det_items;
+
+        ChannelMapSimpleItem_DET dummy_det;
+        ChannelMapSimpleItem_FE dummy_fe(0, 0, 0);
+            // below ChannelMapSimpleItem_DET examlple
+            // struct ChannelMapSimpleItem_DET {
+            //     uint32_t name;// detector name in 4 char
+            //     uint16_t plane;// plane name in 2 char
+            //     uint8_t segment;// segment number in 8bit int (0-255)
+            //     uint32_t channel;// channel name in 4 char
+            // };
+        dummy_det.name = parse_to32("nil");
+        dummy_det.plane = parse_to16("nil");
+        dummy_det.segment = 0;
+        dummy_det.channel = parse_to32("nil");
+
+        uint32_t maxFillFactor; // gap*FillRatioで可変
+        uint32_t leftId, rightId, gapId;
+        for(auto it = fItems.begin(); it != fItems.end(); ++it){
+            if(it == fItems.begin()){
+                leftId = 0;
+                rightId = it->fe.id;
+                gapId = it->fe.id - 0;
+            } // endif(it == fItems.begin())
+            else if(it != fItems.end() - 1){
+                auto original_left = it;
+                auto original_right = it + 1;
+                leftId = original_left->fe.id;
+                rightId = original_right->fe.id;
+                gapId = rightId - leftId;
+            } // endif(it == fItems.begin()), else if(it != fItems.end() - 1)
+            else{ // last entry
+                leftId = it->fe.id;
+                rightId = UINT32_MAX;
+                gapId = UINT32_MAX - leftId;
+            } // endif(it == fItems.end() - 1)
+
+            new_fe_items.push_back(it->fe);
+            new_det_items.push_back(it->det);
+
+            if(gapId <= 1){
+                continue; // no gap, no dummy entry needed
+            } // endif(gap <= 1)
+            else{
+                // insert dummy entry
+                maxFillFactor = (gapId - 1) * FillRatio;
+                for(int i=0; i < maxFillFactor - 1; ++i){
+                    if(i == 0){ // for the original entry
+                        continue; // already added above
+                    }
+                    else{
+                        dummy_fe.id = 0 + gapId/maxFillFactor * i;
+                        new_fe_items.push_back(dummy_fe);
+                        new_det_items.push_back(dummy_det);
+                        #if DEBUG_PRINT_DUMMY_MAKER
+                        printFEid(dummy_fe);
+                        printDETinfo(dummy_det);
+                        #endif
+                    }
+                } // done(int i=0; i<maxFillFactor - 1; ++i)
+            } // endif(gap > 1)
+        } // for(auto it = fItems.begin(); it != fItems.end(); ++it)
+
+        std::vector<ChannelMapSimpleItem> new_fItems;
+        auto fe_it = new_fe_items.begin();
+        auto det_it = new_det_items.begin();
+        for(; fe_it != new_fe_items.end() && det_it != new_det_items.end(); ++fe_it, ++det_it){
+            ChannelMapSimpleItem item = { *fe_it, *det_it };
+            new_fItems.push_back(item);
+        }
+        fItems = new_fItems;
+        // sort
+        std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
+            return left.fe.id < right.fe.id; // checkDuplicateFEIDsの狭義弱順序がこの不等号の向きに依存している
+        });
+        fItemsFE.clear();
+        fItemsDET.clear();
+        for(const auto& item : fItems){
+            fItemsFE.push_back(item.fe);
+            fItemsDET.push_back(item.det);
+        }
+    }// void ChannelMapSimple::makeDummyEntry2
 
     uint32_t ChannelMapSimple::fileoutAllItems(const std::string& filename) {
         std::ofstream outfile(filename);
