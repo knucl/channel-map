@@ -42,6 +42,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(channel-map PUBLIC stdc++fs)
 endif()
 
+### CERN ROOT
+find_package(ROOT REQUIRED)
+
 ### script
 set(SCRIPT_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/script/chmap-config)
 
@@ -86,12 +89,10 @@ target_link_libraries(speedtest PRIVATE channel-map ${FILESYSTEM_LIB})
 ### simple skeleton
 add_executable(simple-skeleton-program simple_skeleton.cpp)
 target_compile_features(simple-skeleton-program PRIVATE cxx_std_17)
-target_link_libraries(simple-skeleton-program PRIVATE channel-map ${FILESYSTEM_LIB})
-
-### CERN ROOT
-find_package(ROOT REQUIRED)
-target_link_libraries(simple-skeleton-program ${ROOT_LIBRARIES})
-target_link_directories(simple-skeleton-program PRIVATE ${ROOT_INCLUDE_DIRS})
+target_link_libraries(simple-skeleton-program PRIVATE channel-map ${FILESYSTEM_LIB} ROOT::Core ROOT::Hist ROOT::Tree)
+# target_link_libraries(simple-skeleton-program ${ROOT_LIBRARIES})
+# target_link_directories(simple-skeleton-program PRIVATE ${ROOT_LIBRARY_DIRS})
+# target_include_directories(simple-skeleton-program PRIVATE ${ROOT_INCLUDE_DIRS})
 
 ### install
 install(DIRECTORY include/ DESTINATION include)
