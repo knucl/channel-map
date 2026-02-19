@@ -823,6 +823,7 @@ namespace chmap {
             new_fItems.push_back(item);
         }
         fItems = new_fItems;
+        new_fItems.clear();
         // sort
         std::sort(fItems.begin(), fItems.end(), [](const ChannelMapSimpleItem& left, const ChannelMapSimpleItem& right) {
             return left.fe.id < right.fe.id; // checkDuplicateFEIDsの狭義弱順序がこの不等号の向きに依存している
