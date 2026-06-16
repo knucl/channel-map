@@ -65,7 +65,8 @@ private:
     if (itr != m_a2b_map.end()) {
       return itr->second;
     } else {
-      warning << "key not found : " << a << std::endl;
+//      warning << "key not found : " << a << std::endl;
+      CHMAP_WARNING << "key not found : " << a << std::endl;
       return k_null_tuple;
     }
   }
@@ -74,7 +75,8 @@ private:
     if (itr != m_b2a_map.end()) {
       return itr->second;
     } else {
-      warning << "key not found : " << b << std::endl;
+//      warning << "key not found : " << b << std::endl;
+      CHMAP_WARNING << "key not found : " << b << std::endl;
       return k_null_tuple;
     }
   }

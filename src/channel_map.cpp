@@ -26,7 +26,8 @@ ChannelMap::initialize(const std::filesystem::path& file_path) {
   if (file_path.extension() == ".csv") {
     initialize_from_csv(file_path.string());
   } else {
-    error << "anything other than 'csv' is currently unsupported" << std::endl;
+//    error << "anything other than 'csv' is currently unsupported" << std::endl;
+    CHMAP_ERROR << "anything other than 'csv' is currently unsupported" << std::endl;
   }
 }
 
@@ -36,7 +37,8 @@ ChannelMap::initialize_from_csv(const std::string& file_path) {
 
   std::ifstream file(file_path);
   if (!file.is_open()) {
-    error << "file open fail : " << file_path << std::endl;
+//    error << "file open fail : " << file_path << std::endl;
+    CHMAP_ERROR << "file open fail : " << file_path << std::endl;
     std::exit(1);
   }
 
@@ -45,7 +47,8 @@ ChannelMap::initialize_from_csv(const std::string& file_path) {
     int i = 0;
     for (const auto& h : split_line(line)){
       if (std::count(m_header.begin(), m_header.end(), h) > 0) {
-        error << "found duplicate header : " << h << std::endl;
+//        error << "found duplicate header : " << h << std::endl;
+        CHMAP_ERROR << "found duplicate header : " << h << std::endl;
       }
       m_header.push_back(h);
       auto type = split_line(h, '.')[0];
@@ -56,7 +59,8 @@ ChannelMap::initialize_from_csv(const std::string& file_path) {
       }
     }
     if (m_unique_types.size() != k_number_of_tuples) {
-      error << "bad file format : " << line << std::endl;
+//      error << "bad file format : " << line << std::endl;
+      CHMAP_ERROR << "bad file format : " << line << std::endl;
       return;
     }
   }
@@ -67,9 +71,12 @@ ChannelMap::initialize_from_csv(const std::string& file_path) {
     }
     auto tokens = split_line(line);
     if (tokens.size() != m_header.size()) {
-      error << "column size = " << tokens.size()
-            << " does not match header size = " << m_header.size()
-            << ", skip this line : " << line << std::endl;
+//      error << "column size = " << tokens.size()
+//            << " does not match header size = " << m_header.size()
+//            << ", skip this line : " << line << std::endl;
+      CHMAP_ERROR << "column size = " << tokens.size()
+                  << " does not match header size = " << m_header.size()
+                  << ", skip this line : " << line << std::endl;
       continue;
     }
     make_tuple(tokens);
@@ -87,7 +94,8 @@ ChannelMap::make_tuple(const std::vector<std::string>& tokens) {
       tuple.push_back(parse_element(tokens[i]));
     }
     tuples.push_back(tuple);
-    debug << m_a2b_map.size() << "\t" << tuple << std::endl;
+//    debug << m_a2b_map.size() << "\t" << tuple << std::endl;
+    CHMAP_DEBUG << m_a2b_map.size() << "\t" << tuple << std::endl;
   }
   const auto& a = tuples[k_a];
   const auto& b = tuples[k_b];

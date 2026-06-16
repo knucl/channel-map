@@ -58,15 +58,44 @@ private:
   std::unique_ptr<LogBuffer> m_buffer;
 };
 
-#ifdef DEBUG
-LogStream debug(LogLevel::kDEBUG);
-#else
-std::ofstream debug("/dev/null");
-#endif
-LogStream info(LogLevel::kINFO);
-LogStream warning(LogLevel::kWARNING);
-LogStream error(LogLevel::kERROR);
+//#ifdef DEBUG
+//LogStream debug(LogLevel::kDEBUG);
+//#else
+//std::ofstream debug("/dev/null");
+//#endif
+//LogStream info(LogLevel::kINFO);
+//LogStream warning(LogLevel::kWARNING);
+//LogStream error(LogLevel::kERROR);
 
+inline LogStream& debug_stream()
+{
+    static LogStream s(LogLevel::kDEBUG);
+    return s;
 }
+
+inline LogStream& info_stream()
+{
+    static LogStream s(LogLevel::kINFO);
+    return s;
+}
+
+inline LogStream& warning_stream()
+{
+    static LogStream s(LogLevel::kWARNING);
+    return s;
+}
+
+inline LogStream& error_stream()
+{
+    static LogStream s(LogLevel::kERROR);
+    return s;
+}
+
+} // namespace chmap
+
+#define CHMAP_DEBUG   ::chmap::debug_stream()
+#define CHMAP_INFO    ::chmap::info_stream()
+#define CHMAP_WARNING ::chmap::warning_stream()
+#define CHMAP_ERROR   ::chmap::error_stream()
 
 #endif
