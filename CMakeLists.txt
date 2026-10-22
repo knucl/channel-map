@@ -95,7 +95,13 @@ target_link_libraries(simple-skeleton-program PRIVATE channel-map ${FILESYSTEM_L
 # target_link_directories(simple-skeleton-program PRIVATE ${ROOT_LIBRARY_DIRS})
 # target_include_directories(simple-skeleton-program PRIVATE ${ROOT_INCLUDE_DIRS})
 
+### channel map format v0: checker
+add_executable(chmap-check tools/chmap_check.cpp)
+target_compile_features(chmap-check PRIVATE cxx_std_17)
+target_link_libraries(chmap-check PRIVATE channel-map)
+
 ### install
+install(TARGETS chmap-check DESTINATION bin)
 install(DIRECTORY include/ DESTINATION include)
 install(TARGETS skeleton-program DESTINATION bin)
 install(TARGETS fat-skeleton-program DESTINATION bin)

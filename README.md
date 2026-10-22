@@ -109,3 +109,37 @@ your_function()
 ```
 
 See also `skeleton.cpp` for implementation details.
+
+## Format v0: detector definition + channel map
+
+`chmap::DetectorMap` (`detector_map.hpp`) reads two CSV files.
+Detectors are written by name and FE boards by IP address; nothing is hard-coded in the source.
+
+`detectors.csv` (changed only when a detector is added):
+
+```
+device, plane,    segment, ch,   data
+TOF,    -,        0-15,    U/D,  tdc
+BDC,    X/Xp/U/V, -,       0-31, tdc
+```
+
+`map.csv` (edited when cables move):
+
+```
+fe,    fe.ch,  device, plane, segment, ch
+2.169, 4-19,   TOF,    -,     0-15,    U
+2.170, 32-63,  BDC,    Xp,    -,       31-0
+```
+
+- A field is one value, `-` (not used), a list `U/D`, a range `0-15` (descending `15-0` for reversed wiring) or a mix `0-3/8`.
+- In a map row `fe.ch` may hold N channels; each detector field holds 1 value (used for all) or exactly N values.
+- `fe` is `2.169` (= 192.168.2.169), `192.168.2.169` or `0xc0a802a9`. `data` is optional (default: the first data of the device, `tdc`).
+- Blank lines and lines starting with `#` are ignored. Excel CSV (BOM, CRLF) is accepted.
+
+Check before use:
+
+```sh
+chmap-check detectors.csv map.csv [--expand expanded.csv]
+```
+
+Every unknown name, undefined segment/channel, FE channel mapped twice, detector channel wired twice and count mismatch is reported with its line; channels defined but not mapped are warnings. `load()` returns false on any error and leaves the object empty, so a running program can load into a new object and swap it in only on success. See `examples/`.
