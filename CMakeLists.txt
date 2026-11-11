@@ -17,6 +17,8 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -107,7 +109,7 @@ install(TARGETS skeleton-program DESTINATION bin)
 install(TARGETS fat-skeleton-program DESTINATION bin)
 install(TARGETS speedtest DESTINATION bin)
 install(TARGETS simple-skeleton-program DESTINATION bin)
-install(TARGETS channel-map EXPORT ChannelMapTargets DESTINATION lib)
+install(TARGETS channel-map EXPORT ChannelMapTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${HEADERS} DESTINATION include)
 install(FILES ${SCRIPT_SOURCE} DESTINATION bin
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
@@ -116,11 +118,11 @@ install(FILES ${SCRIPT_SOURCE} DESTINATION bin
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/ChannelMapConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/ChannelMapConfigVersion.cmake"
-    DESTINATION lib/cmake/ChannelMap
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ChannelMap
 )
 
 install(EXPORT ChannelMapTargets
     FILE ChannelMapTargets.cmake
     NAMESPACE ChannelMap::
-    DESTINATION lib/cmake/ChannelMap
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ChannelMap
 )
