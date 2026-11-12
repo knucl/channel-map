@@ -19,6 +19,13 @@
 // the object is then left empty. To reload safely, load into a new object
 // and swap it in only when load() succeeded.
 
+// Use the default struct packing whatever was set before this header: a
+// "#pragma pack" left open by an earlier header would otherwise lay these
+// classes (and the standard containers they hold) out differently from the
+// compiled library, and load() would crash.
+#pragma pack(push)
+#pragma pack()
+
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -103,5 +110,7 @@ private:
 };
 
 } // namespace chmap
+
+#pragma pack(pop)
 
 #endif
