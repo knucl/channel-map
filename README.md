@@ -120,7 +120,7 @@ Detectors are written by name and FE boards by IP address; nothing is hard-coded
 ```
 device, plane,    segment, ch,   data
 TOF,    -,        0-15,    U/D,  tdc
-BDC,    X/Xp/U/V, -,       0-31, tdc
+SDC,    X/Xp/Y/Yp, -,      0-31, tdc
 ```
 
 `map.csv` (edited when cables move):
@@ -128,7 +128,7 @@ BDC,    X/Xp/U/V, -,       0-31, tdc
 ```
 fe,    fe.ch,  device, plane, segment, ch
 2.169, 4-19,   TOF,    -,     0-15,    U
-2.170, 32-63,  BDC,    Xp,    -,       31-0
+2.170, 32-63,  SDC,    Xp,    -,       31-0
 ```
 
 - A field is one value, `-` (not used), a list `U/D`, a range `0-15` (descending `15-0` for reversed wiring) or a mix `0-3/8`.

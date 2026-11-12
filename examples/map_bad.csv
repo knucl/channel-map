@@ -7,4 +7,4 @@ fe,    fe.ch,  device, plane, segment, ch
 2.169, 37,     CNC,    -,     0,       L
 2.169, 38,     TOF,    -,     0,       U
 2.1x9, 39,     CNC,    -,     0,       D
-2.170, 0,      BDC,    Y,     -,       0
+2.170, 0,      SDC,    U,     -,       0

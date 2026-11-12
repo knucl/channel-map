@@ -4,4 +4,4 @@ device, plane,    segment, ch,   data
 TRIG,   -,        0-3,     -,    tdc
 TOF,    -,        0-15,    U/D,  tdc
 CNC,    -,        0-3,     U/D,  tdc
-BDC,    X/Xp/U/V, -,       0-31, tdc
+SDC,    X/Xp/Y/Yp, -,      0-31, tdc
